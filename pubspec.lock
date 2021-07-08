@@ -11,9 +11,9 @@ packages:
   audio_service:
     dependency: "direct main"
     description:
-      name: audio_service
-      url: "https://pub.dartlang.org"
-    source: hosted
+      path: "C:/Users/user/AndroidStudioProjects/audio_service"
+      relative: false
+    source: path
     version: "0.17.1"
   audio_session:
     dependency: transitive
@@ -130,6 +130,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "3.1.0"
+  flutter_visualizers:
+    dependency: "direct main"
+    description:
+      name: flutter_visualizers
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.0.2"
   flutter_web_plugins:
     dependency: transitive
     description: flutter
@@ -191,10 +198,10 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "0.12.10"
-  media_store:
+  media_stores:
     dependency: "direct main"
     description:
-      path: "C:/Users/user/AndroidStudioProjects/media_store"
+      path: "C:/Users/user/AndroidStudioProjects/media_stores"
       relative: false
     source: path
     version: "0.0.1"
@@ -212,6 +219,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "1.0.0"
+  palette_generator:
+    dependency: "direct main"
+    description:
+      name: palette_generator
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.3.0"
   path:
     dependency: transitive
     description:

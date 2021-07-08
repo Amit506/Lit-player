@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_visualizers/Visualizers/LineVisualizer.dart';
+import 'package:flutter_visualizers/visualizer.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:lit_player/Providers.dart/SongPlayer.dart';
 import 'package:lit_player/Providers.dart/song.dart';
 import 'package:lit_player/Tuple.dart';
 import 'package:marquee/marquee.dart';
-import 'package:media_store/SongInfo.dart';
+import 'package:media_stores/SongInfo.dart';
 import 'package:provider/provider.dart';
 
 class MusicPlayerScreen extends StatefulWidget {
@@ -55,131 +57,143 @@ class _MusicPlayerScreenState extends State<MusicPlayerScreen>
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
     return Scaffold(
-      body: Container(
-        width: size.width,
-        height: size.height,
-        child: Column(
-          children: [
-            Hero(
-              tag: "a",
-              child: SizedBox(
-                width: size.width * 0.8,
-                height: size.height * 0.7,
-                child: Selector<SongPlayer, Widget>(
-                  selector: (_, changer) => changer.currentWidget,
+      body: Selector<SongPlayer, LinearGradient>(
+        selector: (_, s) => s.getGradientBackground,
+        builder: (context, value, child) {
+          return Container(
+              decoration: BoxDecoration(
+                gradient: value ?? null,
+              ),
+              child: child);
+        },
+        child: Container(
+          width: size.width,
+          height: size.height,
+          child: Column(
+            children: [
+              Hero(
+                tag: "a",
+                child: SizedBox(
+                  width: size.width * 0.8,
+                  height: size.height * 0.75,
+                  child: Selector<SongPlayer, Widget>(
+                    selector: (_, changer) => changer.currentWidget,
+                    builder: (_, data, child) => AnimatedSwitcher(
+                      transitionBuilder: (child, animation) {
+                        final offsetAnimation = Tween<Offset>(
+                                begin: Offset(1.0, 0.0), end: Offset.zero)
+                            .animate(animation);
+                        return FadeTransition(
+                          opacity: animation,
+                          child: SlideTransition(
+                            position: offsetAnimation,
+                            child: child,
+                          ),
+                        );
+                      },
+                      duration: Duration(milliseconds: 500),
+                      child: data,
+                    ),
+                  ),
+                ),
+              ),
+      
+              
+              Flexible(
+                child: Selector<SongPlayer, SongInfo>(
+                  selector: (_, changer) => changer.getLatestSongInfo,
                   builder: (_, data, child) => AnimatedSwitcher(
                     transitionBuilder: (child, animation) {
                       final offsetAnimation = Tween<Offset>(
                               begin: Offset(1.0, 0.0), end: Offset.zero)
                           .animate(animation);
-                      return FadeTransition(
-                        opacity: animation,
-                        child: SlideTransition(
-                          position: offsetAnimation,
-                          child: child,
-                        ),
+                      return SlideTransition(
+                        position: offsetAnimation,
+                        child: child,
                       );
                     },
+                    layoutBuilder:
+                        (Widget currentChild, List<Widget> previousChildren) {
+                      return currentChild;
+                    },
                     duration: Duration(milliseconds: 500),
-                    child: data,
+                    child: songPlayer.bigPlayerTextWidget(data, size),
                   ),
                 ),
               ),
-            ),
-            Flexible(
-              child: Selector<SongPlayer, SongInfo>(
-                selector: (_, changer) => changer.getLatestSongInfo,
-                builder: (_, data, child) => AnimatedSwitcher(
-                  transitionBuilder: (child, animation) {
-                    final offsetAnimation =
-                        Tween<Offset>(begin: Offset(1.0, 0.0), end: Offset.zero)
-                            .animate(animation);
-                    return SlideTransition(
-                      position: offsetAnimation,
-                      child: child,
-                    );
-                  },
-                  layoutBuilder:
-                      (Widget currentChild, List<Widget> previousChildren) {
-                    return currentChild;
-                  },
-                  duration: Duration(milliseconds: 500),
-                  child: songPlayer.bigPlayerTextWidget(data, size),
+              Selector<SongPlayer, Tuple3<double, double, double>>(
+                  selector: (_, foo) =>
+                      Tuple3(foo.sliderMin, foo.sliderMax, foo.sliderCurrent),
+                  builder: (_, data, __) {
+                    return Slider(
+                        min: data.item1,
+                        max: data.item2,
+                        value: data.item3,
+                        onChanged: songPlayer.sliderValueChanged);
+                  }),
+              Padding(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 15.0, vertical: 0.0),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Selector<SongPlayer, double>(
+                        selector: (_, foo) => foo.sliderCurrent,
+                        builder: (_, data, __) {
+                          return Text(getDuration(data));
+                        }),
+                    Selector<SongPlayer, double>(
+                        selector: (_, foo) => foo.sliderMax,
+                        builder: (_, data, __) {
+                          return Text(getDuration(data));
+                        }),
+                  ],
                 ),
               ),
-            ),
-            Selector<SongPlayer, Tuple3<double, double, double>>(
-                selector: (_, foo) =>
-                    Tuple3(foo.sliderMin, foo.sliderMax, foo.sliderCurrent),
-                builder: (_, data, __) {
-                  return Slider(
-                      min: data.item1,
-                      max: data.item2,
-                      value: data.item3,
-                      onChanged: songPlayer.sliderValueChanged);
-                }),
-            Padding(
-              padding:
-                  const EdgeInsets.symmetric(horizontal: 15.0, vertical: 0.0),
-              child: Row(
+              Flexible(
+                child: SongPlayerWidget(
+                    play: () {
+                      songPlayer.playButtonAnimation(_animatedButtonController);
+                    },
+                    next: () {
+                      songPlayer.playNext();
+                      print(songPlayer.hasNext.toString());
+                    },
+                    previous: () {
+                      songPlayer.playPrevious();
+                    },
+                    animatedButtonController: _animatedButtonController),
+              ),
+              Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Selector<SongPlayer, double>(
-                      selector: (_, foo) => foo.sliderCurrent,
+                  Selector<SongPlayer, LoopMode>(
+                      selector: (_, foo) => foo.getLoopMode,
                       builder: (_, data, __) {
-                        return Text(getDuration(data));
+                        return AnimatedSwitcher(
+                            duration: Duration(milliseconds: 500),
+                            child: songPlayer.loopWidgets(() {
+                              onChangingLoopMode(data);
+                            }, data));
                       }),
-                  Selector<SongPlayer, double>(
-                      selector: (_, foo) => foo.sliderMax,
+                  Selector<SongPlayer, bool>(
+                      selector: (_, foo) => foo.isShuffleEnabled,
                       builder: (_, data, __) {
-                        return Text(getDuration(data));
+                        return AnimatedSwitcher(
+                            duration: Duration(milliseconds: 500),
+                            child: songPlayer.shuffleWidget(data, () {
+                              // songPlayer.setIsFirstTimeStarted = true;
+                              if (data) {
+                                songPlayer.shuffleOf();
+                              } else {
+                                songPlayer.shuffleOn();
+                              }
+                            }));
                       }),
                 ],
-              ),
-            ),
-            Flexible(
-              child: SongPlayerWidget(
-                  play: () {
-                    songPlayer.playButtonAnimation(_animatedButtonController);
-                  },
-                  next: () {
-                    songPlayer.playNext();
-                    print(songPlayer.hasNext.toString());
-                  },
-                  previous: () {
-                    songPlayer.playPrevious();
-                  },
-                  animatedButtonController: _animatedButtonController),
-            ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Selector<SongPlayer, LoopMode>(
-                    selector: (_, foo) => foo.getLoopMode,
-                    builder: (_, data, __) {
-                      return AnimatedSwitcher(
-                          duration: Duration(milliseconds: 500),
-                          child: songPlayer.loopWidgets(() {
-                            onChangingLoopMode(data);
-                          }, data));
-                    }),
-                Selector<SongPlayer, bool>(
-                    selector: (_, foo) => foo.isShuffleEnabled,
-                    builder: (_, data, __) {
-                      return AnimatedSwitcher(
-                          duration: Duration(milliseconds: 500),
-                          child: songPlayer.shuffleWidget(data, () {
-                            // songPlayer.setIsFirstTimeStarted = true;
-                            if (data) {
-                              songPlayer.shuffleOf();
-                            } else {
-                              songPlayer.shuffleOn();
-                            }
-                          }));
-                    }),
-              ],
-            )
-          ],
+              )
+            ],
+          ),
         ),
       ),
     );

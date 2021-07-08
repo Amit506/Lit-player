@@ -1,8 +1,8 @@
 import 'dart:typed_data';
 
 import 'package:flutter/foundation.dart';
-import 'package:media_store/media_store.dart';
-import 'package:media_store/videoInfo.dart';
+import 'package:media_stores/media_stores.dart';
+import 'package:media_stores/videoInfo.dart';
 
 class VideoService extends ChangeNotifier {
   List<VideoInfo> videoList = [];
@@ -11,7 +11,7 @@ class VideoService extends ChangeNotifier {
   List<bool> isVideoAvailableThumnails = [];
 
   void initState() async {
-    videoList = await MediaStore.getVideos();
+    videoList = await MediaStores.getVideos();
     videoThumbnails = ValueNotifier(List.filled(videoList.length, null));
     isVideoAvailableThumnails = List.filled(videoList.length, false);
     updateVideoShowList(0, videoList.length < 20 ? videoList.length : 20);
@@ -33,7 +33,7 @@ class VideoService extends ChangeNotifier {
     int i = start;
     while (i < end) {
       if (!isVideoAvailableThumnails[i]) {
-        final bitmap = await MediaStore.videoBitMap(int.parse(videoList[i].id),
+        final bitmap = await MediaStores.videoBitMap(int.parse(videoList[i].id),
                 width: 50, height: 50)
             .onError((error, stackTrace) {
           print(error.toString());

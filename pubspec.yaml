@@ -23,14 +23,17 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  media_store:
-    path: C:/Users/user/AndroidStudioProjects/media_store
+  audio_service:
+    path: C:/Users/user/AndroidStudioProjects/audio_service
+  media_stores:
+    path: C:/Users/user/AndroidStudioProjects/media_stores
   async: null
-  audio_service: ^0.17.1
   cupertino_icons: ^1.0.2
   flutter_tts: ^3.1.0
+  flutter_visualizers: ^0.0.2
   just_audio: ^0.8.0
   marquee: ^2.2.0
+  palette_generator: ^0.3.0
   provider: ^5.0.0
   shimmer: ^2.0.0
   tuple: ^2.0.0

@@ -1,19 +1,25 @@
 import 'dart:math';
+import 'dart:typed_data';
 
 import 'package:audio_service/audio_service.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:lit_player/Providers.dart/BackgroundTask.dart';
 import 'package:marquee/marquee.dart';
-import 'package:media_store/SongInfo.dart';
+import 'package:media_stores/SongInfo.dart';
+import 'package:palette_generator/palette_generator.dart';
 import 'package:shimmer/shimmer.dart';
 import './song.dart';
+
+const universalImage = 'assets/SPACE_album-mock.jpg';
 
 class SongPlayer extends ChangeNotifier {
   static AudioPlayer player = AudioPlayer();
   static final SongPlayer _singleton = SongPlayer._internal();
-  // final backgroundAudioPlayer = AudioPlayerTask();
+  final backgroundAudioPlayer = AudioPlayerTask();
+
   factory SongPlayer() {
     return _singleton;
   }
@@ -71,11 +77,42 @@ class SongPlayer extends ChangeNotifier {
     return await player.setUrl(uri);
   }
 
+  Color color = Colors.white;
+  LinearGradient gradientBackground;
+  get getGradientBackground => this.gradientBackground;
+
+  set setGradientBackground(gradientBackground) =>
+      this.gradientBackground = gradientBackground;
   bool get isPlaying => player.playing;
 
   bool get hasNext => player.hasNext;
   bool get hasPrevious => player.hasPrevious;
   Duration get duration => player.duration;
+  generatebackGroundColor(
+    Uint8List byte,
+  ) async {
+    ImageProvider<Object> image;
+    if (byte != null) {
+      image = MemoryImage(byte);
+    } else {
+      image = AssetImage('assets/SPACE_album-mock.jpg');
+    }
+
+    final p = await PaletteGenerator.fromImageProvider(image);
+
+    final newGradient = LinearGradient(
+        colors: [
+          p.dominantColor.color,
+          p.lightVibrantColor.color,
+          // p.lightMutedColor.color
+        ],
+        begin: Alignment.topRight,
+        end: Alignment.bottomLeft,
+        stops: [0.4, 0.7]);
+    setGradientBackground = newGradient;
+    notifyListeners();
+  }
+
   playInit() {
     setSliderValues();
     play();
@@ -91,16 +128,24 @@ class SongPlayer extends ChangeNotifier {
 
   play() async {
     await player.play();
+    AudioService.play();
     notifyListeners();
   }
 
   pause() {
     player.pause();
+    AudioService.pause();
+
     notifyListeners();
   }
 
   stop() {
     player.stop();
+    AudioService.stop();
+    // AudioService.currentMediaItemStream.listen((event) {
+    //   print("000");
+    //   print(event.toString());
+    // });
     notifyListeners();
   }
 
@@ -124,6 +169,9 @@ class SongPlayer extends ChangeNotifier {
       key = ValueKey(event);
       final image = await Thumbnail.getQualityThumbnail(
           event, int.parse(getCurrentPlayList[event].id));
+
+      generatebackGroundColor(image);
+
       setCurrentWidget = image != null
           ? Image.memory(
               image,
@@ -134,6 +182,7 @@ class SongPlayer extends ChangeNotifier {
               fit: BoxFit.cover,
               key: key,
             );
+
       latestSongInfo = getCurrentPlayList[event];
       notifyListeners();
       setSliderValues();
@@ -238,7 +287,7 @@ class SongPlayer extends ChangeNotifier {
       case LoopMode.off:
         {
           loopWidget = IconButton(
-              color: Colors.red, icon: Icon(Icons.loop), onPressed: onChange);
+              color: Colors.grey, icon: Icon(Icons.loop), onPressed: onChange);
         }
         break;
       case LoopMode.one:
@@ -261,12 +310,12 @@ class SongPlayer extends ChangeNotifier {
       return IconButton(
         icon: Icon(
           Icons.shuffle,
-          color: Colors.red,
         ),
         onPressed: onTap,
       );
     } else {
       return IconButton(
+        color: Colors.grey,
         icon: Icon(Icons.shuffle),
         onPressed: onTap,
       );
@@ -382,21 +431,25 @@ class SongPlayer extends ChangeNotifier {
 //         .toList();
 //   }
 
-//   initiatingBackGroundTask() async {
-//     await AudioService.start(
-//             backgroundTaskEntrypoint: _backgroundTaskEntrypoint)
-//         .then((value) {
-//       print(value);
-//       AudioService.playbackStateStream.listen((event) {
-//         print(event.playing);
-//         setIsBackGroundAudioPlaying = event.playing;
-//       });
-//     });
-
-//     AudioServiceBackground.setQueue(mediaItem);
-//   }
+  initiatingBackGroundTask() async {
+    print("pppppppppppppppppppppp");
+    await AudioService.start(
+            backgroundTaskEntrypoint: _backgroundTaskEntrypoint)
+        .then((value) {
+      print("----------------------------------" + value.toString());
+      AudioService.playbackStateStream.listen((event) {
+        print(event.playing);
+        // setIsBackGroundAudioPlaying = event.playing;
+      });
+    });
+//     Thumbnail.getQualityThumbnail(0,  getCurrentPlayList[0].id);
+// final media = MediaItem(id: getCurrentPlayList[0].id, album:getCurrentPlayList[0]. album, title: getCurrentPlayList[0].title,bitMap: getCurrentPlayList[0])
+//     AudioServiceBackground.setMediaItem(getCurrentPlayList[isPlaying])
+  }
 // }
 
-// _backgroundTaskEntrypoint() {
-//   AudioServiceBackground.run(() => AudioPlayerTask());
+}
+
+_backgroundTaskEntrypoint() {
+  AudioServiceBackground.run(() => AudioPlayerTask());
 }

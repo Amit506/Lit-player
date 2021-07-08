@@ -2,8 +2,8 @@ import 'dart:typed_data';
 
 import 'package:flutter/cupertino.dart';
 import 'package:lit_player/Providers.dart/FetchData.dart';
-import 'package:media_store/SongInfo.dart';
-import 'package:media_store/media_store.dart';
+import 'package:media_stores/SongInfo.dart';
+import 'package:media_stores/media_stores.dart';
 
 class SongsService extends ChangeNotifier {
   List<SongInfo> songInfoList = [];
@@ -16,7 +16,7 @@ class SongsService extends ChangeNotifier {
 
   set setCurrentSong(SongInfo currentSong) => this.currentSong = currentSong;
   void initState() async {
-    songInfoList = await MediaStore.getSongs();
+    songInfoList = await MediaStores.getSongs();
     songThumbnails = ValueNotifier(List.filled(songInfoList.length, null));
     isAvailableThumnails = List.filled(songInfoList.length, false);
     updateSongShowList(0, songInfoList.length < 20 ? songInfoList.length : 20);
@@ -39,7 +39,7 @@ class SongsService extends ChangeNotifier {
     int i = start;
     while (i < end) {
       if (!isAvailableThumnails[i]) {
-        final bitmap = await MediaStore.bitMap(int.parse(songInfoList[i].id),
+        final bitmap = await MediaStores.bitMap(int.parse(songInfoList[i].id),
                 width: 50, height: 50)
             .onError((error, stackTrace) {
           print(error.toString());
@@ -57,7 +57,7 @@ class SongsService extends ChangeNotifier {
   }
 
   Future<Uint8List> getQualityThumbnail(int index, int id) async {
-    final bitmap = await MediaStore.bitMap(id, width: 500, height: 500)
+    final bitmap = await MediaStores.bitMap(id, width: 500, height: 500)
         .onError((error, stackTrace) {
       print(error.toString());
       return null;
@@ -68,7 +68,7 @@ class SongsService extends ChangeNotifier {
 
 class Thumbnail {
   static Future<Uint8List> getQualityThumbnail(int index, int id) async {
-    final bitmap = await MediaStore.bitMap(id, width: 500, height: 500)
+    final bitmap = await MediaStores.bitMap(id, width: 500, height: 500)
         .onError((error, stackTrace) {
       print(error.toString());
       return null;

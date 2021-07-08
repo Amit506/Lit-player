@@ -4,6 +4,7 @@ import 'dart:typed_data';
 import 'package:async/async.dart';
 import 'package:audio_service/audio_service.dart';
 import 'package:flutter/material.dart';
+import 'package:lit_player/A/music_visualizer.dart';
 import 'package:lit_player/Animations.dart';
 import 'package:lit_player/Providers.dart/SongPlayer.dart';
 import 'package:lit_player/Providers.dart/song.dart';
@@ -11,8 +12,8 @@ import 'package:lit_player/Screens.dart/MusicPlayerScreen.dart';
 import 'package:lit_player/Screens.dart/VideoScreen.dart';
 import 'package:lit_player/utils.dart/ListAvatar.dart';
 import 'package:marquee/marquee.dart';
-import 'package:media_store/SongInfo.dart';
-import 'package:media_store/media_store.dart';
+import 'package:media_stores/SongInfo.dart';
+import 'package:media_stores/media_stores.dart';
 import 'package:provider/provider.dart';
 
 import '../Tuple.dart';
@@ -25,19 +26,41 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen>
-    with SingleTickerProviderStateMixin {
+    with SingleTickerProviderStateMixin, WidgetsBindingObserver {
   AnimationController _animatedButtonController;
   @override
   void initState() {
     super.initState();
     initiating();
-
+    WidgetsBinding.instance.addObserver(this);
+    AudioService.connect();
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
       initAudioService();
     });
 
     _animatedButtonController =
         AnimationController(vsync: this, duration: Duration(milliseconds: 500));
+  }
+
+  @override
+  void dispose() {
+    AudioService.disconnect();
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    switch (state) {
+      case AppLifecycleState.resumed:
+        AudioService.connect();
+        break;
+      case AppLifecycleState.paused:
+        AudioService.disconnect();
+        break;
+      default:
+        break;
+    }
   }
 
   bool onlyOneDrag = true;
@@ -103,6 +126,21 @@ class _HomeScreenState extends State<HomeScreen>
                       itemBuilder: (_, i) {
                         final songs = value.songShowList;
                         return ListTile(
+                          trailing: Selector<SongPlayer, SongInfo>(
+                            child: SizedBox(
+                                height: 20,
+                                width: 30,
+                                child: VisualizerWidget()),
+                            selector: (_, s) => s.latestSongInfo,
+                            builder: (context, value, child) {
+                              if (value == songs[i]) {
+                                return child;
+                              } else {
+                                return SizedBox();
+                              }
+                            },
+                          ),
+                          subtitle: Text(songs[i].artist),
                           onTap: () async {
                             songPlayer.playerSetAudioSoucres(
                                 Provider.of<SongsService>(context,
@@ -118,6 +156,7 @@ class _HomeScreenState extends State<HomeScreen>
                               Widget animatedSwitcherChild = values[i] != null
                                   ? AlbumArtAvatar(image: values[i])
                                   : Tempavatar();
+                              print(values[i].toString());
                               return AnimatedSwitcher(
                                   child: animatedSwitcherChild,
                                   duration: Duration(seconds: 1));
@@ -174,6 +213,7 @@ class _HomeScreenState extends State<HomeScreen>
     Provider.of<SongPlayer>(context, listen: false).indexesStream();
     Provider.of<SongPlayer>(context, listen: false).sequenceStateChange();
     Provider.of<SongPlayer>(context, listen: false).listenStream();
+    Provider.of<SongPlayer>(context, listen: false).initiatingBackGroundTask();
     // Provider.of<SongPlayer>(context, listen: false).convertToMediaItems();
     // Provider.of<SongPlayer>(context, listen: false).initiatingBackGroundTask();
   }
