@@ -30,8 +30,7 @@ class AlbumArtAvatar extends StatelessWidget {
       width: 50,
       decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(15.0),
-          image:
-              DecorationImage(image: MemoryImage(image), fit: BoxFit.contain)),
+          image: DecorationImage(image: MemoryImage(image), fit: BoxFit.cover)),
     );
   }
 }

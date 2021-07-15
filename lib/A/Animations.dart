@@ -20,7 +20,7 @@ class HeroPageBuilder extends PageRouteBuilder {
               child,
         );
   @override
-  Duration get transitionDuration => Duration(seconds: 10);
+  Duration get transitionDuration => Duration(seconds: 2);
 }
 
 class HeroMusicOpenScreen extends PageRouteBuilder {

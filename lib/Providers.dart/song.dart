@@ -8,8 +8,8 @@ import 'package:media_stores/media_stores.dart';
 class SongsService extends ChangeNotifier {
   List<SongInfo> songInfoList = [];
   List<SongInfo> songShowList = [];
-  ValueNotifier<List<Uint8List>> songThumbnails = ValueNotifier(<Uint8List>[]);
-  List<bool> isAvailableThumnails = [];
+  // ValueNotifier<List<Uint8List>> songThumbnails = ValueNotifier(<Uint8List>[]);
+  // List<bool> isAvailableThumnails = [];
   List<SongInfo> get allPlaysListAvailable => songInfoList;
   SongInfo currentSong;
   SongInfo get getCurrentSong => this.currentSong;
@@ -17,8 +17,8 @@ class SongsService extends ChangeNotifier {
   set setCurrentSong(SongInfo currentSong) => this.currentSong = currentSong;
   void initState() async {
     songInfoList = await MediaStores.getSongs();
-    songThumbnails = ValueNotifier(List.filled(songInfoList.length, null));
-    isAvailableThumnails = List.filled(songInfoList.length, false);
+    // songThumbnails = ValueNotifier(List.filled(songInfoList.length, null));
+    // isAvailableThumnails = List.filled(songInfoList.length, false);
     updateSongShowList(0, songInfoList.length < 20 ? songInfoList.length : 20);
   }
 
@@ -38,21 +38,24 @@ class SongsService extends ChangeNotifier {
     print("-------------------getthumbnail------------");
     int i = start;
     while (i < end) {
-      if (!isAvailableThumnails[i]) {
-        final bitmap = await MediaStores.bitMap(int.parse(songInfoList[i].id),
-                width: 50, height: 50)
-            .onError((error, stackTrace) {
-          print(error.toString());
-        });
+      print("990000000000000000000");
+      // if (!isAvailableThumnails[i]) {
+      final bitmap = await MediaStores.bitMap(int.parse(songInfoList[i].id),
+              width: 120, height: 80)
+          .onError((error, stackTrace) {
+        print(error.toString());
+      });
 
-        if (bitmap != null) {
-          songThumbnails.value[i] = bitmap;
-          notifyListeners();
-        }
-        isAvailableThumnails[i] = true;
-
-        i++;
+      if (bitmap != null) {
+        songInfoList[i] = songInfoList[i].copyWith(imageBit: bitmap);
+        songShowList[i] = songInfoList[i];
+        // songThumbnails.value[i] = bitmap;
+        notifyListeners();
       }
+      // isAvailableThumnails[i] = true;
+
+      i++;
+      // }
     }
   }
 
@@ -68,7 +71,7 @@ class SongsService extends ChangeNotifier {
 
 class Thumbnail {
   static Future<Uint8List> getQualityThumbnail(int index, int id) async {
-    final bitmap = await MediaStores.bitMap(id, width: 500, height: 500)
+    final bitmap = await MediaStores.bitMap(id, width: 500, height: 650)
         .onError((error, stackTrace) {
       print(error.toString());
       return null;

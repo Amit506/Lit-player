@@ -7,6 +7,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:lit_player/Providers.dart/BackgroundTask.dart';
+import 'package:lit_player/utils.dart/albumimageWidgte.dart';
+import 'package:lit_player/utils.dart/text_player_widget.dart';
 import 'package:marquee/marquee.dart';
 import 'package:media_stores/SongInfo.dart';
 import 'package:palette_generator/palette_generator.dart';
@@ -25,8 +27,8 @@ class SongPlayer extends ChangeNotifier {
   }
 
   SongPlayer._internal();
-  Widget currentWidget = Center(
-    child: CircularProgressIndicator(),
+  Widget currentWidget = AlbumImageWidget(
+    initial: true,
   );
   ValueKey _key;
   ValueKey get key => this._key;
@@ -77,7 +79,11 @@ class SongPlayer extends ChangeNotifier {
     return await player.setUrl(uri);
   }
 
-  Color color = Colors.white;
+  Color playButtonColor = Colors.white;
+  get getPlayButtonColor => this.playButtonColor;
+
+  set setPlayButtonColor(Color playButtonColor) =>
+      this.playButtonColor = playButtonColor;
   LinearGradient gradientBackground;
   get getGradientBackground => this.gradientBackground;
 
@@ -88,7 +94,7 @@ class SongPlayer extends ChangeNotifier {
   bool get hasNext => player.hasNext;
   bool get hasPrevious => player.hasPrevious;
   Duration get duration => player.duration;
-  generatebackGroundColor(
+  Future<void> generatebackGroundColor(
     Uint8List byte,
   ) async {
     ImageProvider<Object> image;
@@ -97,20 +103,22 @@ class SongPlayer extends ChangeNotifier {
     } else {
       image = AssetImage('assets/SPACE_album-mock.jpg');
     }
+    try {
+      final p = await PaletteGenerator.fromImageProvider(image);
 
-    final p = await PaletteGenerator.fromImageProvider(image);
-
-    final newGradient = LinearGradient(
-        colors: [
-          p.dominantColor.color,
-          p.lightVibrantColor.color,
-          // p.lightMutedColor.color
-        ],
-        begin: Alignment.topRight,
-        end: Alignment.bottomLeft,
-        stops: [0.4, 0.7]);
-    setGradientBackground = newGradient;
-    notifyListeners();
+      final newGradient = LinearGradient(
+          colors: [
+            p.dominantColor.color,
+            p.mutedColor.color,
+          ],
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
+          stops: [0.4, 0.7]);
+      setGradientBackground = newGradient;
+      setPlayButtonColor = p.vibrantColor.color ?? p.darkMutedColor.color;
+    } catch (e) {
+      print(e);
+    }
   }
 
   playInit() {
@@ -170,18 +178,12 @@ class SongPlayer extends ChangeNotifier {
       final image = await Thumbnail.getQualityThumbnail(
           event, int.parse(getCurrentPlayList[event].id));
 
-      generatebackGroundColor(image);
+      await generatebackGroundColor(image);
 
-      setCurrentWidget = image != null
-          ? Image.memory(
-              image,
-              key: key,
-            )
-          : Image.asset(
-              'assets/SPACE_album-mock.jpg',
-              fit: BoxFit.cover,
-              key: key,
-            );
+      setCurrentWidget = AlbumImageWidget(
+        memeoryImage: image,
+        key: key,
+      );
 
       latestSongInfo = getCurrentPlayList[event];
       notifyListeners();
@@ -323,7 +325,7 @@ class SongPlayer extends ChangeNotifier {
   }
 
   Widget smallPlayerTextWidget(SongInfo info, Size size) {
-    key = ValueKey(Random().nextInt(200000));
+    key = ValueKey(Random().nextInt(20000));
     if (latestSongInfo == null) {
       return Shimmer.fromColors(
           baseColor: Colors.grey[300],
@@ -346,30 +348,14 @@ class SongPlayer extends ChangeNotifier {
             ],
           ));
     } else {
-      return Column(
+      return TextPlayerWidget(
+        title: getLatestSongInfo.title,
+        artist: getLatestSongInfo.artist,
         key: key,
-        children: [
-          Flexible(
-            child: Marquee(
-              text: getLatestSongInfo.title,
-              style: TextStyle(
-                  fontSize: 14.0,
-                  color: Colors.green,
-                  fontWeight: FontWeight.w400),
-              blankSpace: 20.0,
-              velocity: 100.0,
-              pauseAfterRound: Duration(seconds: 1),
-              startPadding: 10.0,
-              scrollAxis: Axis.horizontal,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              accelerationDuration: Duration(seconds: 1),
-              accelerationCurve: Curves.linear,
-              decelerationDuration: Duration(milliseconds: 500),
-              decelerationCurve: Curves.easeOut,
-            ),
-          ),
-          Flexible(child: Text(getLatestSongInfo.artist))
-        ],
+        fontSize: 14.0,
+        titletTextColor: Colors.green,
+        artisttextColor: Colors.black,
+        artistFontSize: 12,
       );
     }
   }
@@ -377,30 +363,14 @@ class SongPlayer extends ChangeNotifier {
   Widget bigPlayerTextWidget(SongInfo info, Size size) {
     key = ValueKey(Random().nextInt(200000));
 
-    return Column(
+    return TextPlayerWidget(
+      title: getLatestSongInfo.title,
+      artist: getLatestSongInfo.artist,
       key: key,
-      children: [
-        Flexible(
-          child: Marquee(
-            text: getLatestSongInfo.title,
-            style: TextStyle(
-                fontSize: 14.0,
-                color: Colors.green,
-                fontWeight: FontWeight.w400),
-            blankSpace: 20.0,
-            velocity: 100.0,
-            pauseAfterRound: Duration(seconds: 1),
-            startPadding: 10.0,
-            scrollAxis: Axis.horizontal,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            accelerationDuration: Duration(seconds: 1),
-            accelerationCurve: Curves.linear,
-            decelerationDuration: Duration(milliseconds: 500),
-            decelerationCurve: Curves.easeOut,
-          ),
-        ),
-        Flexible(child: Text(getLatestSongInfo.artist))
-      ],
+      fontSize: 22.0,
+      titletTextColor: Colors.white,
+      artisttextColor: Colors.white,
+      artistFontSize: 15,
     );
   }
 

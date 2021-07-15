@@ -1,8 +1,14 @@
+import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
+
 import 'package:lit_player/Providers.dart/VideoService.dart';
+import 'package:lit_player/Providers.dart/videoPlayerProvider.dart';
+import 'package:lit_player/Screens.dart/HorizontalVideoPlayer.dart';
 import 'package:lit_player/utils.dart/ListAvatar.dart';
+import 'package:media_stores/media_stores.dart';
+import 'package:media_stores/videoInfo.dart';
 import 'package:provider/provider.dart';
 
 class VideoListScreen extends StatefulWidget {
@@ -22,9 +28,45 @@ class _VideoListScreenState extends State<VideoListScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final videoService = Provider.of<VideoService>(context);
     return Scaffold(
       appBar: AppBar(
         title: Text('Videos'),
+        actions: <Widget>[
+          DropdownButtonHideUnderline(
+            child: DropdownButton<SortBy>(
+                isDense: true,
+                hint: Text('sort by'),
+                items: [
+                  DropdownMenuItem(
+                    child: Text('Size'),
+                    value: SortBy.Size,
+                  ),
+                  DropdownMenuItem(
+                    child: Text('A-Z'),
+                    value: SortBy.AtoZ,
+                  ),
+                  DropdownMenuItem(
+                    child: Text('Default'),
+                    value: SortBy.Default,
+                  ),
+                ],
+                onChanged: (value) {
+                  videoService.sortBy(value);
+
+                  // setState(() {
+                  //   sorted = value;
+                  //   Navigator.push(
+                  //       context,
+                  //       MaterialPageRoute(
+                  //           builder: (context) => SortedNewsClass(
+                  //                 search: widget.search,
+                  //                 sort: sorted,
+                  //               )));
+                  // });
+                }),
+          ),
+        ],
       ),
       body: Consumer<VideoService>(
         builder: (context, value, child) {
@@ -39,30 +81,54 @@ class _VideoListScreenState extends State<VideoListScreen> {
                 if (notification.metrics.pixels ==
                     notification.metrics.maxScrollExtent) {
                   value.updateVideoShowList(value.videoShowList.length,
-                      value.videoShowList.length + 20);
+                      value.videoShowList.length + 30);
                 }
+                return true;
               },
               child: ListView.builder(
                 itemBuilder: (context, i) {
                   return ListTile(
-                    leading: ValueListenableBuilder<List<Uint8List>>(
-                      valueListenable: value.videoThumbnails,
-                      builder: (context, values, child) {
-                        Widget animatedSwitcherChild = values[i] != null
-                            ? AlbumArtAvatar(image: values[i])
-                            : Tempavatar();
-                        return AnimatedSwitcher(
-                            // transitionBuilder: (child, animation) {
-                            //   return ScaleTransition(
-                            //     scale: animation,
-                            //     child: child,
-                            //   );
-                            // },
-                            child: animatedSwitcherChild,
-                            duration: Duration(seconds: 1));
-                      },
-                    ),
+                    onTap: () async {
+                      final filePath = await MediaStores.getPath(videos[i].uri);
+                      print(filePath);
+                      Provider.of<VideoPlayerProvider>(context, listen: false)
+                          .onInitVideo(filePath);
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (_) => HorizontalVideoPlayer(
+                                    uri: filePath,
+                                  )));
+                    },
+                    leading: Selector<VideoService, List<VideoInfo>>(
+                        selector: (_, changer) => changer.videoShowList,
+                        builder: (_, data, child) {
+                          Widget animatedSwitcherChild =
+                              data[i].imageBit != null
+                                  ? AlbumArtAvatar(image: data[i].imageBit)
+                                  : Tempavatar();
+                          return FittedBox(
+                            fit: BoxFit.cover,
+                            child: AnimatedSwitcher(
+                                // transitionBuilder: (child, animation) {
+                                //   return ScaleTransition(
+                                //     scale: animation,
+                                //     child: child,
+                                //   );
+                                // },
+                                child: animatedSwitcherChild,
+                                duration: Duration(milliseconds: 500)),
+                          );
+                        }),
                     title: Text(videos[i].title),
+                    subtitle: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text('${videos[i].dateAdded}'),
+                        Text(
+                            '${videos[i].size.substring(0, videos[i].size.length < 4 ? videos[i].size.length : 4)} mb')
+                      ],
+                    ),
                   );
                 },
                 itemCount: videos.length,

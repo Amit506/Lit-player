@@ -5,7 +5,7 @@ import 'package:async/async.dart';
 import 'package:audio_service/audio_service.dart';
 import 'package:flutter/material.dart';
 import 'package:lit_player/A/music_visualizer.dart';
-import 'package:lit_player/Animations.dart';
+import 'package:lit_player/A/Animations.dart';
 import 'package:lit_player/Providers.dart/SongPlayer.dart';
 import 'package:lit_player/Providers.dart/song.dart';
 import 'package:lit_player/Screens.dart/MusicPlayerScreen.dart';
@@ -15,8 +15,7 @@ import 'package:marquee/marquee.dart';
 import 'package:media_stores/SongInfo.dart';
 import 'package:media_stores/media_stores.dart';
 import 'package:provider/provider.dart';
-
-import '../Tuple.dart';
+import 'package:tuple/tuple.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({Key key}) : super(key: key);
@@ -95,7 +94,7 @@ class _HomeScreenState extends State<HomeScreen>
               fontWeight: FontWeight.w800),
         ),
       ),
-      body: Container(
+      body: SizedBox(
           height: size.height,
           width: size.width,
           child: Stack(
@@ -107,6 +106,7 @@ class _HomeScreenState extends State<HomeScreen>
                     child: Text('no songs available in device'),
                   );
                 } else {
+                  print(value.songInfoList[0].toString());
                   return NotificationListener<ScrollNotification>(
                     onNotification: (notification) {
                       if (notification.metrics.pixels ==
@@ -150,18 +150,27 @@ class _HomeScreenState extends State<HomeScreen>
                             songPlayer.play();
                             _animatedButtonController.forward();
                           },
-                          leading: ValueListenableBuilder<List<Uint8List>>(
-                            valueListenable: value.songThumbnails,
-                            builder: (context, values, child) {
-                              Widget animatedSwitcherChild = values[i] != null
-                                  ? AlbumArtAvatar(image: values[i])
-                                  : Tempavatar();
-                              print(values[i].toString());
-                              return AnimatedSwitcher(
-                                  child: animatedSwitcherChild,
-                                  duration: Duration(seconds: 1));
-                            },
-                          ),
+                          leading: Selector<SongsService, List<SongInfo>>(
+                              selector: (_, changer) => changer.songShowList,
+                              builder: (_, data, child) {
+                                Widget animatedSwitcherChild = data[i]
+                                            .imageBit !=
+                                        null
+                                    ? AlbumArtAvatar(image: data[i].imageBit)
+                                    : Tempavatar();
+                                return FittedBox(
+                                  fit: BoxFit.cover,
+                                  child: AnimatedSwitcher(
+                                      // transitionBuilder: (child, animation) {
+                                      //   return ScaleTransition(
+                                      //     scale: animation,
+                                      //     child: child,
+                                      //   );
+                                      // },
+                                      child: animatedSwitcherChild,
+                                      duration: Duration(milliseconds: 500)),
+                                );
+                              }),
                           title: Text(songs[i].title),
                         );
                       },
@@ -241,7 +250,6 @@ class BottomSongWidget extends StatelessWidget {
     } else {
       _animatedButtonController.reverse();
     }
-    print('rrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr');
     return Material(
       color: Colors.transparent,
       child: Column(
@@ -282,7 +290,7 @@ class BottomSongWidget extends StatelessWidget {
                   child: Hero(
                     tag: "a",
                     child: Selector<SongPlayer, Widget>(
-                      selector: (_, changer) => changer.currentWidget,
+                      selector: (_, changer) => changer.getCurrentWidget,
                       builder: (_, data, child) => AnimatedSwitcher(
                         duration: Duration(milliseconds: 500),
                         child: data,

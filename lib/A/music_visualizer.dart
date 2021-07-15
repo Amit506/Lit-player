@@ -3,7 +3,8 @@ import 'package:flutter/material.dart';
 class MusicVisualizer extends StatefulWidget {
   final Color colors;
   final int duration;
-  const MusicVisualizer({Key key, this.colors, this.duration})
+  final int end;
+  const MusicVisualizer({Key key, this.colors, this.duration, this.end})
       : super(key: key);
 
   @override
@@ -23,10 +24,11 @@ class _MusicVisualizerState extends State<MusicVisualizer>
         parent: animationController,
         curve: Curves.easeInCubic,
         reverseCurve: Curves.easeInCirc);
-    animation = Tween<double>(begin: 0, end: 100).animate(curvedAnimation)
-      ..addListener(() {
-        setState(() {});
-      });
+    animation = Tween<double>(begin: 0, end: widget.end.toDouble())
+        .animate(curvedAnimation)
+          ..addListener(() {
+            setState(() {});
+          });
     animationController.repeat(reverse: true);
   }
 
@@ -38,13 +40,15 @@ class _MusicVisualizerState extends State<MusicVisualizer>
 
   @override
   Widget build(BuildContext context) {
-    return Container(
+    return SizedBox(
       width: 2,
-      decoration: BoxDecoration(
-        color: widget.colors,
-        borderRadius: BorderRadius.circular(5),
-      ),
       height: animation.value,
+      child: DecoratedBox(
+        decoration: BoxDecoration(
+          color: widget.colors,
+          borderRadius: BorderRadius.circular(5),
+        ),
+      ),
     );
   }
 }
@@ -57,7 +61,9 @@ class VisualizerWidget extends StatelessWidget {
     Colors.black,
     Colors.green
   ];
-  static List<int> duration = <int>[300, 580, 640, 820];
+  static List<int> duration = <int>[350, 720, 750, 500];
+  static List<int> end = <int>[30, 100, 30, 100];
+
   @override
   Widget build(BuildContext context) {
     return SizedBox(
@@ -67,6 +73,7 @@ class VisualizerWidget extends StatelessWidget {
             4,
             (index) => MusicVisualizer(
                   duration: duration[index],
+                  end: end[index],
                   colors: colors[index],
                 )),
       ),

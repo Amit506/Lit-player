@@ -28,7 +28,9 @@ dependencies:
   media_stores:
     path: C:/Users/user/AndroidStudioProjects/media_stores
   async: null
+  auto_orientation: ^2.0.2
   cupertino_icons: ^1.0.2
+  favorite_button: ^0.0.4
   flutter_tts: ^3.1.0
   flutter_visualizers: ^0.0.2
   just_audio: ^0.8.0
@@ -37,6 +39,7 @@ dependencies:
   provider: ^5.0.0
   shimmer: ^2.0.0
   tuple: ^2.0.0
+  video_player: ^2.1.10
 
 dev_dependencies:
   flutter_test:
