@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:lit_player/Providers.dart/SongPlayer.dart';
 import 'package:lit_player/Providers.dart/videoPlayerProvider.dart';
 import 'package:lit_player/main.dart';
+import 'package:lit_player/utils.dart/OverLayWidget.dart';
 import 'package:provider/provider.dart';
 import 'package:tuple/tuple.dart';
 import 'package:video_player/video_player.dart';

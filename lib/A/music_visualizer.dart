@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:lit_player/Theme.dart/appTheme.dart';
 
 class MusicVisualizer extends StatefulWidget {
   final Color colors;
@@ -56,10 +57,10 @@ class _MusicVisualizerState extends State<MusicVisualizer>
 class VisualizerWidget extends StatelessWidget {
   const VisualizerWidget({Key key}) : super(key: key);
   static List<Color> colors = <Color>[
-    Colors.black,
-    Colors.green,
-    Colors.black,
-    Colors.green
+    lightBlueColor,
+    Colors.redAccent,
+    Colors.greenAccent,
+    Colors.deepOrangeAccent,
   ];
   static List<int> duration = <int>[350, 720, 750, 500];
   static List<int> end = <int>[30, 100, 30, 100];

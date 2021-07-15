@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:math';
 import 'dart:typed_data';
 
 import 'package:async/async.dart';
@@ -10,7 +11,9 @@ import 'package:lit_player/Providers.dart/SongPlayer.dart';
 import 'package:lit_player/Providers.dart/song.dart';
 import 'package:lit_player/Screens.dart/MusicPlayerScreen.dart';
 import 'package:lit_player/Screens.dart/VideoScreen.dart';
+import 'package:lit_player/Theme.dart/appTheme.dart';
 import 'package:lit_player/utils.dart/ListAvatar.dart';
+import 'package:lit_player/utils.dart/bottoSongWidget.dart';
 import 'package:marquee/marquee.dart';
 import 'package:media_stores/SongInfo.dart';
 import 'package:media_stores/media_stores.dart';
@@ -74,7 +77,7 @@ class _HomeScreenState extends State<HomeScreen>
       appBar: AppBar(
         actions: [
           IconButton(
-              icon: Icon(Icons.near_me),
+              icon: Icon(Icons.video_collection_rounded),
               onPressed: () {
                 Navigator.push(context,
                     MaterialPageRoute(builder: (_) => VideoListScreen()));
@@ -178,6 +181,23 @@ class _HomeScreenState extends State<HomeScreen>
                   );
                 }
               }),
+              Transform.rotate(
+                angle: -pi / 2,
+                alignment: Alignment.centerRight,
+                child: Align(
+                  alignment: Alignment.centerRight,
+                  child: ClipPath(
+                      clipper: CustomHalfCircleClipper(),
+                      child: GestureDetector(
+                        onTap: () =>
+                            Provider.of<AppTheme>(context, listen: false)
+                                .changeTheme(),
+                        child: CircleAvatar(
+                          radius: 30,
+                        ),
+                      )),
+                ),
+              ),
               AnimatedPositioned(
                 duration: Duration(seconds: 1),
                 child: Align(
@@ -230,139 +250,18 @@ class _HomeScreenState extends State<HomeScreen>
   void initAudioService() async {}
 }
 
-class BottomSongWidget extends StatelessWidget {
-  const BottomSongWidget({
-    Key key,
-    @required AnimationController animatedButtonController,
-    @required this.size,
-    @required this.onPanUpdate,
-  })  : _animatedButtonController = animatedButtonController,
-        super(key: key);
-  final AnimationController _animatedButtonController;
-  final Size size;
-  final Function(DragEndDetails) onPanUpdate;
+class CustomHalfCircleClipper extends CustomClipper<Path> {
+  @override
+  Path getClip(Size size) {
+    final Path path = new Path();
+    path.lineTo(0.0, size.height / 2);
+    path.lineTo(size.width, size.height / 2);
+    path.lineTo(size.width, 0);
+    return path;
+  }
 
   @override
-  Widget build(BuildContext context) {
-    final songPlayer = Provider.of<SongPlayer>(context, listen: false);
-    if (songPlayer.isPlaying) {
-      _animatedButtonController.forward();
-    } else {
-      _animatedButtonController.reverse();
-    }
-    return Material(
-      color: Colors.transparent,
-      child: Column(
-        children: [
-          Expanded(
-            child: Selector<SongPlayer, Tuple3<double, double, double>>(
-                selector: (_, foo) =>
-                    Tuple3(foo.sliderMin, foo.sliderMax, foo.sliderCurrent),
-                builder: (_, data, __) {
-                  return Align(
-                    alignment: Alignment.bottomLeft,
-                    child: SliderTheme(
-                      data: SliderTheme.of(context).copyWith(
-                          overlayShape:
-                              RoundSliderOverlayShape(overlayRadius: 0.0),
-                          thumbShape: RoundSliderThumbShape(
-                              enabledThumbRadius: 4.0,
-                              disabledThumbRadius: 3.0),
-                          trackHeight: 3.0,
-                          trackShape: RectangularSliderTrackShape()),
-                      child: Slider(
-                          min: data.item1,
-                          max: data.item2,
-                          value: data.item3,
-                          onChanged: songPlayer.sliderValueChanged),
-                    ),
-                  );
-                }),
-          ),
-          SizedBox(
-            height: 78,
-            width: size.width,
-            child: Row(
-              mainAxisSize: MainAxisSize.max,
-              children: [
-                SizedBox(
-                  width: size.width * 0.2,
-                  child: Hero(
-                    tag: "a",
-                    child: Selector<SongPlayer, Widget>(
-                      selector: (_, changer) => changer.getCurrentWidget,
-                      builder: (_, data, child) => AnimatedSwitcher(
-                        duration: Duration(milliseconds: 500),
-                        child: data,
-                      ),
-                    ),
-                  ),
-                ),
-                Expanded(
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Padding(
-                        padding: EdgeInsets.all(8.0),
-                        child: SizedBox(
-                          width: size.width * 0.6,
-                          child: GestureDetector(
-                              onTap: () {
-                                // songPlayer.play();
-                                Navigator.push(
-                                    context,
-                                    HeroMusicOpenScreen(
-                                        page: MusicPlayerScreen()));
-                              },
-                              onHorizontalDragEnd: onPanUpdate,
-                              child: Selector<SongPlayer, SongInfo>(
-                                selector: (_, changer) =>
-                                    changer.getLatestSongInfo,
-                                builder: (_, data, child) => AnimatedSwitcher(
-                                  transitionBuilder: (child, animation) {
-                                    final offsetAnimation = Tween<Offset>(
-                                            begin: Offset(1.0, 0.0),
-                                            end: Offset.zero)
-                                        .animate(animation);
-                                    return FadeTransition(
-                                      opacity: animation,
-                                      child: SlideTransition(
-                                        position: offsetAnimation,
-                                        child: child,
-                                      ),
-                                    );
-                                  },
-                                  layoutBuilder: (Widget currentChild,
-                                      List<Widget> previousChildren) {
-                                    return currentChild;
-                                  },
-                                  duration: Duration(milliseconds: 500),
-                                  child: songPlayer.smallPlayerTextWidget(
-                                      data, size),
-                                ),
-                              )),
-                        ),
-                      ),
-                      Flexible(
-                        child: GestureDetector(
-                          onTap: () {
-                            songPlayer
-                                .playButtonAnimation(_animatedButtonController);
-                          },
-                          child: AnimatedIcon(
-                              size: 50,
-                              icon: AnimatedIcons.play_pause,
-                              progress: _animatedButtonController),
-                        ),
-                      ),
-                    ],
-                  ),
-                )
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
+  bool shouldReclip(CustomClipper<Path> oldClipper) {
+    return true;
   }
 }

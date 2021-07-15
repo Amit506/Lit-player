@@ -2,14 +2,18 @@ import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
+import 'package:lit_player/Providers.dart/SearchProvider.dart';
 
 import 'package:lit_player/Providers.dart/VideoService.dart';
 import 'package:lit_player/Providers.dart/videoPlayerProvider.dart';
 import 'package:lit_player/Screens.dart/HorizontalVideoPlayer.dart';
+import 'package:lit_player/Screens.dart/VideoSearchScreen.dart';
 import 'package:lit_player/utils.dart/ListAvatar.dart';
 import 'package:media_stores/media_stores.dart';
 import 'package:media_stores/videoInfo.dart';
 import 'package:provider/provider.dart';
+
+import 'package:lit_player/utils.dart/getDuration.dart';
 
 class VideoListScreen extends StatefulWidget {
   const VideoListScreen({Key key}) : super(key: key);
@@ -86,6 +90,7 @@ class _VideoListScreenState extends State<VideoListScreen> {
                 return true;
               },
               child: ListView.builder(
+                shrinkWrap: true,
                 itemBuilder: (context, i) {
                   return ListTile(
                     onTap: () async {
@@ -100,6 +105,15 @@ class _VideoListScreenState extends State<VideoListScreen> {
                                     uri: filePath,
                                   )));
                     },
+                    trailing: Text(
+                      getDuration(
+                        videos[i].duration != null
+                            ? double.parse(videos[i].duration)
+                            : '-',
+                      ),
+                    ),
+                    // style: TextStyle(color: Colors.grey),
+
                     leading: Selector<VideoService, List<VideoInfo>>(
                         selector: (_, changer) => changer.videoShowList,
                         builder: (_, data, child) {
@@ -136,6 +150,15 @@ class _VideoListScreenState extends State<VideoListScreen> {
             );
           }
         },
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          Provider.of<SearchService>(context, listen: false).allSearchableList =
+              Provider.of<VideoService>(context, listen: false).videoList;
+          Navigator.push(
+              context, MaterialPageRoute(builder: (_) => SearchScreen()));
+        },
+        child: Icon(Icons.search),
       ),
     );
   }

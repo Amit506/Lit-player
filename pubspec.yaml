@@ -27,6 +27,7 @@ dependencies:
     path: C:/Users/user/AndroidStudioProjects/audio_service
   media_stores:
     path: C:/Users/user/AndroidStudioProjects/media_stores
+  animated_theme_switcher: ^2.0.1
   async: null
   auto_orientation: ^2.0.2
   cupertino_icons: ^1.0.2
