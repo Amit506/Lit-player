@@ -105,13 +105,13 @@ class _VideoListScreenState extends State<VideoListScreen> {
                                     uri: filePath,
                                   )));
                     },
-                    trailing: Text(
-                      getDuration(
-                        videos[i].duration != null
-                            ? double.parse(videos[i].duration)
-                            : '-',
-                      ),
-                    ),
+                    // trailing: Text(
+                    //   getDuration(
+                    //     videos[i].duration != null
+                    //         ? double.parse(videos[i].duration)
+                    //         : '-',
+                    //   ),
+                    // ),
                     // style: TextStyle(color: Colors.grey),
 
                     leading: Selector<VideoService, List<VideoInfo>>(
@@ -152,13 +152,17 @@ class _VideoListScreenState extends State<VideoListScreen> {
         },
       ),
       floatingActionButton: FloatingActionButton(
+        heroTag: 'b',
         onPressed: () {
           Provider.of<SearchService>(context, listen: false).allSearchableList =
               Provider.of<VideoService>(context, listen: false).videoList;
           Navigator.push(
               context, MaterialPageRoute(builder: (_) => SearchScreen()));
         },
-        child: Icon(Icons.search),
+        child: Icon(
+          Icons.search,
+          color: Colors.white,
+        ),
       ),
     );
   }

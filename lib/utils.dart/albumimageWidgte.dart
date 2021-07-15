@@ -12,7 +12,9 @@ class AlbumImageWidget extends StatelessWidget {
     print(memeoryImage);
     if (initial) {
       return Center(
-        child: CircularProgressIndicator(),
+        child: CircularProgressIndicator(
+          strokeWidth: 2.0,
+        ),
       );
     } else {
       return memeoryImage != null

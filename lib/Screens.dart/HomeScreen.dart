@@ -181,21 +181,39 @@ class _HomeScreenState extends State<HomeScreen>
                   );
                 }
               }),
-              Transform.rotate(
-                angle: -pi / 2,
-                alignment: Alignment.centerRight,
-                child: Align(
+              Positioned(
+                top: size.height / 2,
+                right: 0.0,
+                child: Transform.rotate(
+                  angle: -pi / 2,
                   alignment: Alignment.centerRight,
                   child: ClipPath(
                       clipper: CustomHalfCircleClipper(),
-                      child: GestureDetector(
-                        onTap: () =>
-                            Provider.of<AppTheme>(context, listen: false)
-                                .changeTheme(),
-                        child: CircleAvatar(
-                          radius: 30,
-                        ),
-                      )),
+                      child: CircleAvatar(
+                        radius: 30,
+                      )
+                      //  Consumer<AppTheme>(
+                      //   builder: (context, value, child) {
+                      //     if (value.currentTheme == CurrentTheme.Light) {
+                      //       return Transform.rotate(
+                      //           angle: -pi / 2,
+                      //           child: Icon(Icons.view_day_rounded));
+                      //     } else
+                      //       return Icon(Icons.nightlight_round);
+                      //   },
+                      // )),
+                      ),
+                ),
+              ),
+              Positioned(
+                right: 0,
+                top: size.height / 2 + 30 + 16,
+                child: Transform.rotate(
+                  angle: pi,
+                  child: GestureDetector(
+                      onTap: () => Provider.of<AppTheme>(context, listen: false)
+                          .changeTheme(),
+                      child: Icon(Icons.nightlight_round)),
                 ),
               ),
               AnimatedPositioned(

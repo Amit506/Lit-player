@@ -60,7 +60,7 @@ class _SearchScreenState extends State<SearchScreen> {
                     tag: "b",
                     child: Icon(
                       Icons.search,
-                      size: 80,
+                      size: 120,
                     ),
                   ),
                 );

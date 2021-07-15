@@ -325,7 +325,7 @@ class SongPlayer extends ChangeNotifier {
   }
 
   Widget smallPlayerTextWidget(SongInfo info, Size size, BuildContext context) {
-    key = ValueKey(Random().nextInt(20000));
+    key = ValueKey(int.parse(info?.id ?? '0'));
     if (latestSongInfo == null) {
       return Shimmer.fromColors(
           baseColor: Colors.grey[300],
@@ -352,16 +352,16 @@ class SongPlayer extends ChangeNotifier {
         title: getLatestSongInfo.title,
         artist: getLatestSongInfo.artist,
         key: key,
-        fontSize: Theme.of(context).textTheme.bodyText1.fontSize,
-        titletTextColor: Theme.of(context).textTheme.bodyText1.color,
-        artisttextColor: Theme.of(context).textTheme.bodyText2.color,
-        artistFontSize: Theme.of(context).textTheme.bodyText2.fontSize,
+        fontSize: Theme.of(context).textTheme.subtitle1.fontSize,
+        titletTextColor: Theme.of(context).textTheme.subtitle1.color,
+        artisttextColor: Theme.of(context).textTheme.caption.color,
+        artistFontSize: Theme.of(context).textTheme.caption.fontSize,
       );
     }
   }
 
   Widget bigPlayerTextWidget(SongInfo info, Size size) {
-    key = ValueKey(Random().nextInt(200000));
+    key = ValueKey(int.parse(info?.id ?? '0'));
 
     return TextPlayerWidget(
       title: getLatestSongInfo.title,

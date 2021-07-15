@@ -74,19 +74,7 @@ class _MusicPlayerScreenState extends State<MusicPlayerScreen>
           child: Column(
             children: [
               SizedBox(
-                height: 20,
-              ),
-              Align(
-                alignment: Alignment.topLeft,
-                child: IconButton(
-                  iconSize: 30.0,
-                  icon: Icon(
-                    Icons.close_rounded,
-                    color: Colors.white,
-                  ),
-                  onPressed: null,
-                  color: Colors.white,
-                ),
+                height: 40,
               ),
               SizedBox(
                 width: size.width,

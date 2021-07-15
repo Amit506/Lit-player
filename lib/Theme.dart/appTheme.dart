@@ -31,19 +31,10 @@ class AppTheme extends ChangeNotifier {
         inactiveTrackColor: darkGreenColor,
         inactiveTickMarkColor: darkGreenColor,
       ),
-      textTheme: Typography.whiteRedwoodCity
-      //  TextTheme(
-      //   // subtitle1: TextStyle(
-      //   //   fontSize: 14.0,
-      //   //   color: Colors.white54,
-      //   // ),
-      //   bodyText1: TextStyle(
-      //     fontSize: 14.0,
-      //     color: lightGreenColor,
-      //   ),
-      //   bodyText2: TextStyle(fontSize: 12.0, color: Colors.white),
-      // )
-      );
+      textTheme: Typography.whiteRedwoodCity,
+      floatingActionButtonTheme: FloatingActionButtonThemeData(
+        backgroundColor: darkGreenColor,
+      ));
 
   static final lightTheme = ThemeData(
       brightness: Brightness.light,
@@ -56,7 +47,7 @@ class AppTheme extends ChangeNotifier {
         inactiveTrackColor: lightGreenColor,
         inactiveTickMarkColor: lightGreenColor,
       ),
-      textTheme: Typography.blackRedwoodCity
+      textTheme: Typography.blackRedwoodCity,
       //  TextTheme(
       //   // subtitle1: TextStyle(
       //   //   fontSize: 14.0,
@@ -69,7 +60,9 @@ class AppTheme extends ChangeNotifier {
       //   ),
       //   bodyText2: TextStyle(fontSize: 12.0, color: Colors.white),
       // ),
-      );
+      floatingActionButtonTheme: FloatingActionButtonThemeData(
+        backgroundColor: lightGreenColor,
+      ));
 }
 
 const darkGreenColor = Color(0xFF0A2E07);
