@@ -17,8 +17,7 @@ class SongsService extends ChangeNotifier {
   set setCurrentSong(SongInfo currentSong) => this.currentSong = currentSong;
   void initState() async {
     songInfoList = await MediaStores.getSongs();
-    // songThumbnails = ValueNotifier(List.filled(songInfoList.length, null));
-    // isAvailableThumnails = List.filled(songInfoList.length, false);
+
     updateSongShowList(0, songInfoList.length < 20 ? songInfoList.length : 20);
   }
 
@@ -35,27 +34,23 @@ class SongsService extends ChangeNotifier {
   }
 
   Future getThumbail({int index, int id, int start = 0, int end = 15}) async {
-    print("-------------------getthumbnail------------");
     int i = start;
     while (i < end) {
-      print("990000000000000000000");
-      // if (!isAvailableThumnails[i]) {
       final bitmap = await MediaStores.bitMap(int.parse(songInfoList[i].id),
               width: 160, height: 120)
           .onError((error, stackTrace) {
         print(error.toString());
+        return null;
       });
 
       if (bitmap != null) {
         songInfoList[i] = songInfoList[i].copyWith(imageBit: bitmap);
         songShowList[i] = songInfoList[i];
-        // songThumbnails.value[i] = bitmap;
+
         notifyListeners();
       }
-      // isAvailableThumnails[i] = true;
 
       i++;
-      // }
     }
   }
 

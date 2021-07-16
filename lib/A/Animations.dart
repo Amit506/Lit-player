@@ -17,10 +17,12 @@ class HeroPageBuilder extends PageRouteBuilder {
             Animation<double> secondaryAnimation,
             Widget child,
           ) =>
-              child,
+              SizeTransition(sizeFactor: animation, child: child),
         );
   @override
   Duration get transitionDuration => Duration(seconds: 2);
+  @override
+  Curve get barrierCurve => Curves.easeOutCubic;
 }
 
 class HeroMusicOpenScreen extends PageRouteBuilder {

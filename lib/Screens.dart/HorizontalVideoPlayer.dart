@@ -64,7 +64,7 @@ class _HorizontalVideoPlayerState extends State<HorizontalVideoPlayer>
 
   @override
   Widget build(BuildContext context) {
-    final size = MediaQuery.of(context).size;
+    // final size = MediaQuery.of(context).size;
     final videoProvider =
         Provider.of<VideoPlayerProvider>(context, listen: false);
     return Scaffold(

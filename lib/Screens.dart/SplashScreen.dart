@@ -25,8 +25,8 @@ class _SplashScreenState extends State<SplashScreen>
     animateController = AnimationController(
       duration: Duration(milliseconds: 800),
       vsync: this,
-    )..forward().whenComplete(
-        () => Navigator.push(context, HeroPageBuilder(page: HomeScreen())));
+    )..forward().whenComplete(() => Navigator.pushReplacement(
+        context, HeroPageBuilder(page: HomeScreen())));
   }
 
   @override
@@ -56,6 +56,7 @@ class _SplashScreenState extends State<SplashScreen>
                 BuildContext toHeroContext,
               ) {
                 final Hero toHero = toHeroContext.widget;
+
                 return RotationTransition(
                   turns: animation,
                   child: toHero.child,

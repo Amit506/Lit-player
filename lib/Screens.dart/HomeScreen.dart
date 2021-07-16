@@ -72,7 +72,7 @@ class _HomeScreenState extends State<HomeScreen>
     print('rebuild------------------------');
     final size = MediaQuery.of(context).size;
     final songPlayer = Provider.of<SongPlayer>(context, listen: false);
-    final songService = Provider.of<SongsService>(context, listen: false);
+    // final songService = Provider.of<SongsService>(context, listen: false);
     return Scaffold(
       appBar: AppBar(
         actions: [
@@ -109,7 +109,6 @@ class _HomeScreenState extends State<HomeScreen>
                     child: Text('No songs available in device'),
                   );
                 } else {
-                  print(value.songInfoList[0].toString());
                   return NotificationListener<ScrollNotification>(
                     onNotification: (notification) {
                       if (notification.metrics.pixels ==

@@ -5,6 +5,7 @@ import 'package:flutter_visualizers/visualizer.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:lit_player/Providers.dart/SongPlayer.dart';
 import 'package:lit_player/Providers.dart/song.dart';
+import 'package:lit_player/utils.dart/getDuration.dart';
 // import 'package:lit_player/Tuple.dart';
 import 'package:marquee/marquee.dart';
 import 'package:media_stores/SongInfo.dart';
@@ -191,7 +192,6 @@ class _MusicPlayerScreenState extends State<MusicPlayerScreen>
                         },
                         next: () {
                           songPlayer.playNext();
-                          print(songPlayer.hasNext.toString());
                         },
                         previous: () {
                           songPlayer.playPrevious();
@@ -214,9 +214,7 @@ class _MusicPlayerScreenState extends State<MusicPlayerScreen>
                       }),
                   FavoriteButton(
                     iconSize: 38,
-                    valueChanged: (_isFavorite) {
-                      print('Is Favorite $_isFavorite)');
-                    },
+                    valueChanged: (_isFavorite) {},
                   ),
                   Selector<SongPlayer, bool>(
                       selector: (_, foo) => foo.isShuffleEnabled,
@@ -224,7 +222,6 @@ class _MusicPlayerScreenState extends State<MusicPlayerScreen>
                         return AnimatedSwitcher(
                             duration: Duration(milliseconds: 500),
                             child: songPlayer.shuffleWidget(data, () {
-                              // songPlayer.setIsFirstTimeStarted = true;
                               if (data) {
                                 songPlayer.shuffleOf();
                               } else {
@@ -242,36 +239,23 @@ class _MusicPlayerScreenState extends State<MusicPlayerScreen>
   }
 
   onChangingLoopMode(LoopMode mode) {
-    // songPlayer.setIsFirstTimeStarted = true;
-
     switch (mode) {
       case LoopMode.off:
         {
-          print('ooooooo----');
           songPlayer.loopOn();
-          // songPlayer.setPreviousLoopMode = LoopMode.off;
         }
         break;
       case LoopMode.one:
         {
           songPlayer.loopOff();
-          // songPlayer.setPreviousLoopMode = LoopMode.one;
         }
         break;
       case LoopMode.all:
         {
           songPlayer.loopOnlyOne();
-          // songPlayer.setPreviousLoopMode = LoopMode.all;
         }
         break;
     }
-  }
-
-  String getDuration(double value) {
-    Duration duration = Duration(milliseconds: value.round());
-    return [duration.inMinutes, duration.inSeconds]
-        .map((e) => e.remainder(60).toString().padLeft(2, '0'))
-        .join(':');
   }
 }
 

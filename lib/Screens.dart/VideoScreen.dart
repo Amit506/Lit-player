@@ -57,17 +57,6 @@ class _VideoListScreenState extends State<VideoListScreen> {
                 ],
                 onChanged: (value) {
                   videoService.sortBy(value);
-
-                  // setState(() {
-                  //   sorted = value;
-                  //   Navigator.push(
-                  //       context,
-                  //       MaterialPageRoute(
-                  //           builder: (context) => SortedNewsClass(
-                  //                 search: widget.search,
-                  //                 sort: sorted,
-                  //               )));
-                  // });
                 }),
           ),
         ],
@@ -100,15 +89,17 @@ class _VideoListScreenState extends State<VideoListScreen> {
                   return ListTile(
                     onTap: () async {
                       final filePath = await MediaStores.getPath(videos[i].uri);
-                      print(filePath);
-                      Provider.of<VideoPlayerProvider>(context, listen: false)
-                          .onInitVideo(filePath);
-                      Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (_) => HorizontalVideoPlayer(
-                                    uri: filePath,
-                                  )));
+
+                      if (filePath != null) {
+                        Provider.of<VideoPlayerProvider>(context, listen: false)
+                            .onInitVideo(filePath);
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (_) => HorizontalVideoPlayer(
+                                      uri: filePath,
+                                    )));
+                      }
                     },
                     leading: Selector<VideoService, List<VideoInfo>>(
                         selector: (_, changer) => changer.videoShowList,
@@ -122,12 +113,6 @@ class _VideoListScreenState extends State<VideoListScreen> {
                           return FittedBox(
                             fit: BoxFit.cover,
                             child: AnimatedSwitcher(
-                                // transitionBuilder: (child, animation) {
-                                //   return ScaleTransition(
-                                //     scale: animation,
-                                //     child: child,
-                                //   );
-                                // },
                                 child: animatedSwitcherChild,
                                 duration: Duration(milliseconds: 500)),
                           );

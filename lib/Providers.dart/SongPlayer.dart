@@ -150,10 +150,7 @@ class SongPlayer extends ChangeNotifier {
   stop() {
     player.stop();
     AudioService.stop();
-    // AudioService.currentMediaItemStream.listen((event) {
-    //   print("000");
-    //   print(event.toString());
-    // });
+
     notifyListeners();
   }
 
@@ -230,24 +227,15 @@ class SongPlayer extends ChangeNotifier {
   }
 
   sequenceStateChange() async {
-    print('--------');
-
     player.sequenceStateStream.listen((event) async {
-      print(event.toString());
       final int index = event.currentIndex;
 
       final mode = event.loopMode;
-      // print('mode ' + mode.toString());
-      // print('current -------' + index.toString());
-      // print('next -------' + playListNextIndex.toString());
-      // print('previous-------' + playListPreviousIndex.toString());
-      // print(getIsFirstTimeStarted.toString());
+
       if ((!getIsFirstTimeStarted && mode != LoopMode.one)) {
         latestSongInfo = getCurrentPlayList[index];
 
-        // print(image.toString());
         notifyListeners();
-        // setSliderValues();
       }
 
       if (getIsFirstTimeStarted) {
@@ -404,7 +392,6 @@ class SongPlayer extends ChangeNotifier {
 //   }
 
   initiatingBackGroundTask() async {
-    print("pppppppppppppppppppppp");
     await AudioService.start(
             backgroundTaskEntrypoint: _backgroundTaskEntrypoint)
         .then((value) {
