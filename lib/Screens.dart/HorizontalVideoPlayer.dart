@@ -38,6 +38,7 @@ class _HorizontalVideoPlayerState extends State<HorizontalVideoPlayer>
     _animatedButtonController =
         Provider.of<VideoPlayerProvider>(context, listen: false)
             .animatedButtonController;
+    if (_controller.value.isInitialized) _controller.play();
   }
 
   @override
@@ -58,6 +59,9 @@ class _HorizontalVideoPlayerState extends State<HorizontalVideoPlayer>
     AutoOrientation.portraitUpMode();
   }
 
+  void rightInkWellTap() => print('right taped');
+  void leftInkWellTap() => print('left taped');
+
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
@@ -71,7 +75,26 @@ class _HorizontalVideoPlayerState extends State<HorizontalVideoPlayer>
             aspectRatio: _controller.value.aspectRatio,
             child: GestureDetector(
               behavior: HitTestBehavior.opaque,
-              onDoubleTap: () {},
+              onDoubleTapDown: (value) {
+                videoProvider.showOverLayFunction();
+                final renderBox = context.findRenderObject() as RenderBox;
+                double limit = renderBox.size.width;
+
+                if (limit < 80)
+                  limit -= 20;
+                else
+                  limit -= 40;
+
+                if (limit > value.localPosition.dx) {
+                  leftInkWellTap();
+
+                  videoProvider.setShowLeftfastForwardWidget();
+                }
+                if (limit < value.localPosition.dx) {
+                  videoProvider.setShowRightfastForwardWidget();
+                  rightInkWellTap();
+                }
+              },
               onTap: () async {
                 if (videoProvider.showOverLay) {
                   videoProvider.instantHideOverLay();
@@ -88,6 +111,8 @@ class _HorizontalVideoPlayerState extends State<HorizontalVideoPlayer>
                       selector: (_, changer) => changer.showOverLay,
                       builder: (_, data, child) => Positioned.fill(
                             child: OverLayVideoWidget(
+                              rightInkWellTap: rightInkWellTap,
+                              leftInkWellTap: leftInkWellTap,
                               showControls: data,
                               isPlaying: _controller.value.isPlaying,
                               videoPlayerController: _controller,
@@ -101,11 +126,7 @@ class _HorizontalVideoPlayerState extends State<HorizontalVideoPlayer>
       ),
     );
   }
-
-  String getDuration(double value) {
-    Duration duration = Duration(milliseconds: value.round());
-    return [duration.inMinutes, duration.inSeconds]
-        .map((e) => e.remainder(60).toString().padLeft(2, '0'))
-        .join(':');
-  }
 }
+
+const whiteColor = Colors.white;
+const blackColor = Colors.black;

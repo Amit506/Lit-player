@@ -57,8 +57,8 @@ class _MusicVisualizerState extends State<MusicVisualizer>
 class VisualizerWidget extends StatelessWidget {
   const VisualizerWidget({Key key}) : super(key: key);
   static List<Color> colors = <Color>[
-    lightBlueColor,
-    Colors.redAccent,
+    Colors.greenAccent,
+    Colors.deepOrangeAccent,
     Colors.greenAccent,
     Colors.deepOrangeAccent,
   ];

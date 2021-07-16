@@ -57,7 +57,7 @@ class VideoService extends ChangeNotifier {
       print("990000000000000000000");
       // if (!isVideoAvailableThumnails[i]) {
       final bitmap = await MediaStores.videoBitMap(int.parse(videoList[i].id),
-              width: 120, height: 80)
+              width: 160, height: 120)
           .onError((error, stackTrace) {
         print(error.toString());
       });

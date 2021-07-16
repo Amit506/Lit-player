@@ -12,7 +12,7 @@ import 'package:lit_player/Providers.dart/song.dart';
 import 'package:lit_player/Screens.dart/MusicPlayerScreen.dart';
 import 'package:lit_player/Screens.dart/VideoScreen.dart';
 import 'package:lit_player/Theme.dart/appTheme.dart';
-import 'package:lit_player/utils.dart/ListAvatar.dart';
+import 'package:lit_player/utils.dart/VideoListAvatar.dart';
 import 'package:lit_player/utils.dart/bottoSongWidget.dart';
 import 'package:marquee/marquee.dart';
 import 'package:media_stores/SongInfo.dart';
@@ -106,7 +106,7 @@ class _HomeScreenState extends State<HomeScreen>
                 if (value.songShowList != null &&
                     value.songShowList.length == 0) {
                   return Center(
-                    child: Text('no songs available in device'),
+                    child: Text('No songs available in device'),
                   );
                 } else {
                   print(value.songInfoList[0].toString());
@@ -191,25 +191,14 @@ class _HomeScreenState extends State<HomeScreen>
                       clipper: CustomHalfCircleClipper(),
                       child: CircleAvatar(
                         radius: 30,
-                      )
-                      //  Consumer<AppTheme>(
-                      //   builder: (context, value, child) {
-                      //     if (value.currentTheme == CurrentTheme.Light) {
-                      //       return Transform.rotate(
-                      //           angle: -pi / 2,
-                      //           child: Icon(Icons.view_day_rounded));
-                      //     } else
-                      //       return Icon(Icons.nightlight_round);
-                      //   },
-                      // )),
-                      ),
+                      )),
                 ),
               ),
               Positioned(
                 right: 0,
                 top: size.height / 2 + 30 + 16,
                 child: Transform.rotate(
-                  angle: pi,
+                  angle: pi + pi / 20,
                   child: GestureDetector(
                       onTap: () => Provider.of<AppTheme>(context, listen: false)
                           .changeTheme(),
@@ -254,9 +243,7 @@ class _HomeScreenState extends State<HomeScreen>
     Provider.of<SongPlayer>(context, listen: false).setLatestSongInfo =
         Provider.of<SongsService>(context, listen: false)
             .allPlaysListAvailable[0];
-    print(Provider.of<SongPlayer>(context, listen: false)
-        .getLatestSongInfo
-        .toString());
+
     Provider.of<SongPlayer>(context, listen: false).indexesStream();
     Provider.of<SongPlayer>(context, listen: false).sequenceStateChange();
     Provider.of<SongPlayer>(context, listen: false).listenStream();

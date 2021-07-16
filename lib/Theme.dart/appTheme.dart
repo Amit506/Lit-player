@@ -48,18 +48,6 @@ class AppTheme extends ChangeNotifier {
         inactiveTickMarkColor: lightGreenColor,
       ),
       textTheme: Typography.blackRedwoodCity,
-      //  TextTheme(
-      //   // subtitle1: TextStyle(
-      //   //   fontSize: 14.0,
-      //   //   color: Colors.black54,
-      //   // ),
-
-      //   bodyText1: TextStyle(
-      //     fontSize: 14.0,
-      //     color: darkGreenColor,
-      //   ),
-      //   bodyText2: TextStyle(fontSize: 12.0, color: Colors.white),
-      // ),
       floatingActionButtonTheme: FloatingActionButtonThemeData(
         backgroundColor: lightGreenColor,
       ));

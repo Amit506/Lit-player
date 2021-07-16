@@ -23,7 +23,7 @@ class AlbumImageWidget extends StatelessWidget {
               fit: BoxFit.cover,
             )
           : Image.asset(
-              'assets/SPACE_album-mock.jpg',
+              'assets/music-note.png',
               fit: BoxFit.cover,
             );
     }

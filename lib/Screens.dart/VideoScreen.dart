@@ -8,7 +8,7 @@ import 'package:lit_player/Providers.dart/VideoService.dart';
 import 'package:lit_player/Providers.dart/videoPlayerProvider.dart';
 import 'package:lit_player/Screens.dart/HorizontalVideoPlayer.dart';
 import 'package:lit_player/Screens.dart/VideoSearchScreen.dart';
-import 'package:lit_player/utils.dart/ListAvatar.dart';
+import 'package:lit_player/utils.dart/VideoListAvatar.dart';
 import 'package:media_stores/media_stores.dart';
 import 'package:media_stores/videoInfo.dart';
 import 'package:provider/provider.dart';
@@ -76,7 +76,7 @@ class _VideoListScreenState extends State<VideoListScreen> {
         builder: (context, value, child) {
           if (value.videoList.length == 0) {
             return Center(
-              child: Text('no items'),
+              child: Text('No videos available in device'),
             );
           } else {
             final videos = value.videoShowList;
@@ -89,7 +89,12 @@ class _VideoListScreenState extends State<VideoListScreen> {
                 }
                 return true;
               },
-              child: ListView.builder(
+              child: ListView.separated(
+                separatorBuilder: (context, i) {
+                  return Divider(
+                    indent: 60,
+                  );
+                },
                 shrinkWrap: true,
                 itemBuilder: (context, i) {
                   return ListTile(
@@ -105,22 +110,15 @@ class _VideoListScreenState extends State<VideoListScreen> {
                                     uri: filePath,
                                   )));
                     },
-                    // trailing: Text(
-                    //   getDuration(
-                    //     videos[i].duration != null
-                    //         ? double.parse(videos[i].duration)
-                    //         : '-',
-                    //   ),
-                    // ),
-                    // style: TextStyle(color: Colors.grey),
-
                     leading: Selector<VideoService, List<VideoInfo>>(
                         selector: (_, changer) => changer.videoShowList,
                         builder: (_, data, child) {
                           Widget animatedSwitcherChild =
                               data[i].imageBit != null
                                   ? AlbumArtAvatar(image: data[i].imageBit)
-                                  : Tempavatar();
+                                  : Tempavatar(
+                                      isSong: false,
+                                    );
                           return FittedBox(
                             fit: BoxFit.cover,
                             child: AnimatedSwitcher(

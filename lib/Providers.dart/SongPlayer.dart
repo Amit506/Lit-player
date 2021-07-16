@@ -101,7 +101,7 @@ class SongPlayer extends ChangeNotifier {
     if (byte != null) {
       image = MemoryImage(byte);
     } else {
-      image = AssetImage('assets/SPACE_album-mock.jpg');
+      image = AssetImage('assets/music-note.png');
     }
     try {
       final p = await PaletteGenerator.fromImageProvider(image);
@@ -289,7 +289,9 @@ class SongPlayer extends ChangeNotifier {
       case LoopMode.off:
         {
           loopWidget = IconButton(
-              color: Colors.grey, icon: Icon(Icons.loop), onPressed: onChange);
+              color: Colors.grey[200],
+              icon: Icon(Icons.loop),
+              onPressed: onChange);
         }
         break;
       case LoopMode.one:
@@ -317,7 +319,7 @@ class SongPlayer extends ChangeNotifier {
       );
     } else {
       return IconButton(
-        color: Colors.grey,
+        color: Colors.grey[200],
         icon: Icon(Icons.shuffle),
         onPressed: onTap,
       );

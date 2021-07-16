@@ -3,6 +3,7 @@ import 'package:lit_player/A/Animations.dart';
 import 'package:lit_player/Providers.dart/VideoService.dart';
 import 'package:lit_player/Providers.dart/song.dart';
 import 'package:lit_player/Screens.dart/HomeScreen.dart';
+import 'package:lit_player/Theme.dart/appTheme.dart';
 import 'package:media_stores/media_stores.dart';
 import 'package:provider/provider.dart';
 
@@ -22,7 +23,7 @@ class _SplashScreenState extends State<SplashScreen>
     Provider.of<SongsService>(context, listen: false).initState();
     Provider.of<VideoService>(context, listen: false).initState();
     animateController = AnimationController(
-      duration: Duration(seconds: 1),
+      duration: Duration(milliseconds: 800),
       vsync: this,
     )..forward().whenComplete(
         () => Navigator.push(context, HeroPageBuilder(page: HomeScreen())));
@@ -38,7 +39,7 @@ class _SplashScreenState extends State<SplashScreen>
   Widget build(BuildContext context) {
     return Scaffold(
         body: Container(
-      color: Color(0xF8BEECD0),
+      color: lightGreenColor,
       child: Center(
         child: FadeTransition(
           opacity:

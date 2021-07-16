@@ -5,16 +5,61 @@ import 'package:flutter/material.dart';
 import 'package:video_player/video_player.dart';
 
 class VideoPlayerProvider extends ChangeNotifier {
+  Timer _timer;
+  Timer _rightFastForwardTimer;
+  Timer _leftFastForwardTimer;
   VideoPlayerController _videocontroller;
   AnimationController animatedButtonController;
+  int initialForward = 10;
   VideoPlayerController get videocontroller => this._videocontroller;
-
+  bool showLeftFastWordWidget = false;
+  bool showRightFastWordWidget = false;
   set videocontroller(VideoPlayerController value) =>
       this._videocontroller = value;
   onInitVideo(String uri) {
     videocontroller = VideoPlayerController.file(File.fromUri(Uri.parse(uri)));
     sliderListenSetup();
     postionStream();
+  }
+
+  setShowLeftfastForwardWidget() {
+    videocontroller.seekTo(Duration(
+        seconds: videocontroller.value.position.inSeconds - initialForward));
+    initialForward -= 10;
+    if (_leftFastForwardTimer?.isActive ?? false)
+      _rightFastForwardTimer.cancel();
+
+    showLeftFastWordWidget = true;
+    _leftFastForwardTimer = Timer(Duration(seconds: 1), () {
+      setHideLeftfastForwardWidget();
+    });
+    notifyListeners();
+  }
+
+  setHideLeftfastForwardWidget() {
+    initialForward = 10;
+    showLeftFastWordWidget = false;
+    notifyListeners();
+  }
+
+  setShowRightfastForwardWidget() {
+    videocontroller.seekTo(Duration(
+        seconds: videocontroller.value.position.inSeconds + initialForward));
+    initialForward += 10;
+    if (_rightFastForwardTimer?.isActive ?? false)
+      _rightFastForwardTimer.cancel();
+
+    showRightFastWordWidget = true;
+    _rightFastForwardTimer = Timer(Duration(seconds: 1), () {
+      setHideRightfastForwardWidget();
+    });
+    notifyListeners();
+  }
+
+  setHideRightfastForwardWidget() {
+    initialForward = 10;
+    showRightFastWordWidget = false;
+    notifyListeners();
   }
 
   void sliderListenSetup() async {
@@ -52,14 +97,27 @@ class VideoPlayerProvider extends ChangeNotifier {
   }
 
   void hideOverLay() {
-    Future.delayed(Duration(seconds: 2), () {
+    removeTimer();
+    Future.delayed(Duration(seconds: 1), () {
       showOverLay = false;
       notifyListeners();
     });
   }
 
+  setTimer() {
+    _timer = Timer(Duration(seconds: 3), () {
+      instantHideOverLay();
+    });
+  }
+
+  removeTimer() {
+    if (_timer?.isActive ?? false) _timer.cancel();
+  }
+
   void showOverLayFunction() {
+    removeTimer();
     showOverLay = true;
+    setTimer();
     notifyListeners();
   }
 
