@@ -28,12 +28,11 @@ dependencies:
   media_stores:
     path: C:/Users/user/AndroidStudioProjects/media_stores
   animated_theme_switcher: ^2.0.1
-  async: null
+  # async: null
   auto_orientation: ^2.0.2
   cupertino_icons: ^1.0.2
   favorite_button: ^0.0.4
   flutter_tts: ^3.1.0
-  flutter_visualizers: ^0.0.2
   just_audio: ^0.8.0
   marquee: ^2.2.0
   palette_generator: ^0.3.0

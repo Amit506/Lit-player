@@ -74,28 +74,11 @@ class _HorizontalVideoPlayerState extends State<HorizontalVideoPlayer>
           child: AspectRatio(
             aspectRatio: _controller.value.aspectRatio,
             child: GestureDetector(
+              onDoubleTap: () {},
               behavior: HitTestBehavior.opaque,
-              onDoubleTapDown: (value) {
-                videoProvider.showOverLayFunction();
-                final renderBox = context.findRenderObject() as RenderBox;
-                double limit = renderBox.size.width;
-
-                if (limit < 80)
-                  limit -= 20;
-                else
-                  limit -= 40;
-
-                if (limit > value.localPosition.dx) {
-                  leftInkWellTap();
-
-                  videoProvider.setShowLeftfastForwardWidget();
-                }
-                if (limit < value.localPosition.dx) {
-                  videoProvider.setShowRightfastForwardWidget();
-                  rightInkWellTap();
-                }
-              },
+              onDoubleTapDown: (value) => onDoubleTap(value, videoProvider),
               onTap: () async {
+                print('----------------');
                 if (videoProvider.showOverLay) {
                   videoProvider.instantHideOverLay();
                 } else {
@@ -125,6 +108,26 @@ class _HorizontalVideoPlayerState extends State<HorizontalVideoPlayer>
         ),
       ),
     );
+  }
+
+  onDoubleTap(TapDownDetails value, VideoPlayerProvider videoProvider) {
+    videoProvider.showOverLayFunction();
+    final renderBox = context.findRenderObject() as RenderBox;
+    final double limit = renderBox.size.width / 2;
+    // final divided = renderBox.size.width / 3;
+
+    print(limit);
+
+    print(value.localPosition.dx);
+    if (limit - 20 > value.localPosition.dx) {
+      leftInkWellTap();
+
+      videoProvider.setShowLeftfastForwardWidget();
+    }
+    if (limit + 20 < value.localPosition.dx) {
+      videoProvider.setShowRightfastForwardWidget();
+      rightInkWellTap();
+    }
   }
 }
 

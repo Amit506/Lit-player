@@ -1,7 +1,6 @@
 import 'package:favorite_button/favorite_button.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_visualizers/Visualizers/LineVisualizer.dart';
-import 'package:flutter_visualizers/visualizer.dart';
+
 import 'package:just_audio/just_audio.dart';
 import 'package:lit_player/Providers.dart/SongPlayer.dart';
 import 'package:lit_player/Providers.dart/song.dart';

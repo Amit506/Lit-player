@@ -38,12 +38,6 @@ class _OverLayVideoWidgetState extends State<OverLayVideoWidget>
     //     AnimationController(vsync: this, duration: Duration(milliseconds: 500));
   }
 
-  // @override
-  // void didChangeDependencies() {
-  //   super.didChangeDependencies();
-  //   print("olllllllllllllllllllllllllllllddddddddddddddddddddddddddddddddwwww");
-  // }
-
   @override
   void didUpdateWidget(covariant OverLayVideoWidget oldWidget) {
     super.didUpdateWidget(oldWidget);
@@ -87,7 +81,8 @@ class _OverLayVideoWidgetState extends State<OverLayVideoWidget>
                     selector: (_, changer) => Tuple2(
                         changer.showLeftFastWordWidget, changer.initialForward),
                     builder: (_, data, child) => Flexible(
-                      child: Opacity(
+                      child: AnimatedOpacity(
+                          duration: Duration(milliseconds: 500),
                           opacity: data.item1 ? 1.0 : 0.0,
                           child: LeftForwardWidget(
                             seeked: data.item2,
