@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:lit_player/A/Animations.dart';
 import 'package:lit_player/Providers.dart/SongPlayer.dart';
 import 'package:lit_player/Screens.dart/MusicPlayerScreen.dart';
+import 'package:lit_player/utils.dart/SlideBottomWidget.dart';
 import 'package:media_stores/SongInfo.dart';
 import 'package:provider/provider.dart';
 import 'package:tuple/tuple.dart';
@@ -23,7 +24,7 @@ class BottomSongWidget extends StatelessWidget {
     final songPlayer = Provider.of<SongPlayer>(context, listen: false);
     if (songPlayer.isPlaying) {
       _animatedButtonController.forward();
-    } else {
+    } else if (!songPlayer.isPlaying) {
       _animatedButtonController.reverse();
     }
     return Material(
@@ -31,13 +32,13 @@ class BottomSongWidget extends StatelessWidget {
       child: Column(
         children: [
           Expanded(
-            child: Selector<SongPlayer, Tuple3<double, double, double>>(
-                selector: (_, foo) =>
-                    Tuple3(foo.sliderMin, foo.sliderMax, foo.sliderCurrent),
-                builder: (_, data, __) {
-                  return Align(
-                    alignment: Alignment.bottomLeft,
-                    child: SliderTheme(
+            child: Align(
+              alignment: Alignment.bottomLeft,
+              child: Selector<SongPlayer, Tuple3<double, double, double>>(
+                  selector: (_, foo) =>
+                      Tuple3(foo.sliderMin, foo.sliderMax, foo.sliderCurrent),
+                  builder: (_, data, __) {
+                    return SliderTheme(
                       data: SliderTheme.of(context).copyWith(
                           overlayShape:
                               RoundSliderOverlayShape(overlayRadius: 0.0),
@@ -51,9 +52,9 @@ class BottomSongWidget extends StatelessWidget {
                           max: data.item2,
                           value: data.item3,
                           onChanged: songPlayer.sliderValueChanged),
-                    ),
-                  );
-                }),
+                    );
+                  }),
+            ),
           ),
           SizedBox(
             height: 78,
@@ -83,40 +84,23 @@ class BottomSongWidget extends StatelessWidget {
                         child: SizedBox(
                           width: size.width * 0.6,
                           child: GestureDetector(
-                              onTap: () {
-                                // songPlayer.play();
-                                Navigator.push(
-                                    context,
-                                    HeroMusicOpenScreen(
-                                        page: MusicPlayerScreen()));
-                              },
-                              onHorizontalDragEnd: onPanUpdate,
-                              child: Selector<SongPlayer, SongInfo>(
-                                selector: (_, changer) =>
-                                    changer.getLatestSongInfo,
-                                builder: (_, data, child) => AnimatedSwitcher(
-                                  transitionBuilder: (child, animation) {
-                                    final offsetAnimation = Tween<Offset>(
-                                            begin: Offset(1.0, 0.0),
-                                            end: Offset.zero)
-                                        .animate(animation);
-                                    return FadeTransition(
-                                      opacity: animation,
-                                      child: SlideTransition(
-                                        position: offsetAnimation,
-                                        child: child,
-                                      ),
-                                    );
-                                  },
-                                  layoutBuilder: (Widget currentChild,
-                                      List<Widget> previousChildren) {
-                                    return currentChild;
-                                  },
-                                  duration: Duration(milliseconds: 500),
-                                  child: songPlayer.smallPlayerTextWidget(
-                                      data, size, context),
-                                ),
-                              )),
+                            onTap: () {
+                              // songPlayer.play();
+                              Navigator.push(
+                                  context,
+                                  HeroMusicOpenScreen(
+                                      page: MusicPlayerScreen()));
+                            },
+                            onHorizontalDragEnd: onPanUpdate,
+                            child: Selector<SongPlayer, SongInfo>(
+                              selector: (_, changer) =>
+                                  changer.getLatestSongInfo,
+                              builder: (_, data, child) => SlideBottomWidget(
+                                child: songPlayer.smallPlayerTextWidget(
+                                    data, size, context),
+                              ),
+                            ),
+                          ),
                         ),
                       ),
                       Flexible(

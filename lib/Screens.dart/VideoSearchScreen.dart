@@ -7,6 +7,7 @@ import 'package:lit_player/Screens.dart/HorizontalVideoPlayer.dart';
 import 'package:media_stores/media_stores.dart';
 import 'package:provider/provider.dart';
 import 'package:lit_player/utils.dart/getDuration.dart';
+import 'package:share/share.dart';
 
 class SearchScreen extends StatefulWidget {
   const SearchScreen({Key key}) : super(key: key);
@@ -74,6 +75,13 @@ class _SearchScreenState extends State<SearchScreen> {
                     itemCount: list.length,
                     itemBuilder: (_, i) {
                       return ListTile(
+                        onLongPress: () async {
+                          final filePath =
+                              await MediaStores.getPath(list[i].uri);
+                          await Share.shareFiles(
+                            [filePath],
+                          );
+                        },
                         onTap: () async {
                           final filePath =
                               await MediaStores.getPath(list[i].uri);

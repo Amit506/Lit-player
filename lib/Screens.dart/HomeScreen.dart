@@ -1,24 +1,18 @@
-import 'dart:async';
 import 'dart:math';
-import 'dart:typed_data';
 
-import 'package:async/async.dart';
 import 'package:audio_service/audio_service.dart';
 import 'package:flutter/material.dart';
 import 'package:lit_player/A/music_visualizer.dart';
-import 'package:lit_player/A/Animations.dart';
 import 'package:lit_player/Providers.dart/SongPlayer.dart';
 import 'package:lit_player/Providers.dart/song.dart';
-import 'package:lit_player/Screens.dart/MusicPlayerScreen.dart';
 import 'package:lit_player/Screens.dart/VideoScreen.dart';
 import 'package:lit_player/Theme.dart/appTheme.dart';
 import 'package:lit_player/utils.dart/VideoListAvatar.dart';
 import 'package:lit_player/utils.dart/bottoSongWidget.dart';
-import 'package:marquee/marquee.dart';
+
 import 'package:media_stores/SongInfo.dart';
-import 'package:media_stores/media_stores.dart';
+
 import 'package:provider/provider.dart';
-import 'package:tuple/tuple.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({Key key}) : super(key: key);
@@ -152,27 +146,23 @@ class _HomeScreenState extends State<HomeScreen>
                             songPlayer.play();
                             _animatedButtonController.forward();
                           },
-                          leading: Selector<SongsService, List<SongInfo>>(
-                              selector: (_, changer) => changer.songShowList,
-                              builder: (_, data, child) {
-                                Widget animatedSwitcherChild = data[i]
-                                            .imageBit !=
-                                        null
-                                    ? AlbumArtAvatar(image: data[i].imageBit)
-                                    : Tempavatar();
-                                return FittedBox(
-                                  fit: BoxFit.cover,
-                                  child: AnimatedSwitcher(
-                                      // transitionBuilder: (child, animation) {
-                                      //   return ScaleTransition(
-                                      //     scale: animation,
-                                      //     child: child,
-                                      //   );
-                                      // },
-                                      child: animatedSwitcherChild,
-                                      duration: Duration(milliseconds: 500)),
-                                );
-                              }),
+                          leading: FittedBox(
+                            fit: BoxFit.cover,
+                            child: AnimatedSwitcher(
+                              duration: Duration(milliseconds: 500),
+                              child: Selector<SongsService, List<SongInfo>>(
+                                  selector: (_, changer) =>
+                                      changer.songShowList,
+                                  builder: (_, data, child) {
+                                    Widget animatedSwitcherChild =
+                                        data[i].imageBit != null
+                                            ? AlbumArtAvatar(
+                                                image: data[i].imageBit)
+                                            : Tempavatar();
+                                    return animatedSwitcherChild;
+                                  }),
+                            ),
+                          ),
                           title: Text(songs[i].title),
                         );
                       },
@@ -234,14 +224,14 @@ class _HomeScreenState extends State<HomeScreen>
   gotToMusicScreen() async {}
 
   void initiating() async {
+    Provider.of<SongPlayer>(context, listen: false).setLatestSongInfo =
+        Provider.of<SongsService>(context, listen: false)
+            .allPlaysListAvailable[0];
     Provider.of<SongPlayer>(context, listen: false).setCurrentPlayList =
         Provider.of<SongsService>(context, listen: false).allPlaysListAvailable;
     await Provider.of<SongPlayer>(context, listen: false).playerSetAudioSoucres(
       Provider.of<SongsService>(context, listen: false).allPlaysListAvailable,
     );
-    Provider.of<SongPlayer>(context, listen: false).setLatestSongInfo =
-        Provider.of<SongsService>(context, listen: false)
-            .allPlaysListAvailable[0];
 
     Provider.of<SongPlayer>(context, listen: false).indexesStream();
     Provider.of<SongPlayer>(context, listen: false).sequenceStateChange();

@@ -4,11 +4,15 @@ import 'package:flutter/material.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:lit_player/Providers.dart/SongPlayer.dart';
 import 'package:lit_player/Providers.dart/song.dart';
+import 'package:lit_player/Theme.dart/appTheme.dart';
+import 'package:lit_player/utils.dart/SongPlayerwidget.dart';
 import 'package:lit_player/utils.dart/getDuration.dart';
 // import 'package:lit_player/Tuple.dart';
 import 'package:marquee/marquee.dart';
 import 'package:media_stores/SongInfo.dart';
+import 'package:media_stores/media_stores.dart';
 import 'package:provider/provider.dart';
+import 'package:share/share.dart';
 import 'package:tuple/tuple.dart';
 
 class MusicPlayerScreen extends StatefulWidget {
@@ -22,6 +26,7 @@ class MusicPlayerScreen extends StatefulWidget {
 
 class _MusicPlayerScreenState extends State<MusicPlayerScreen>
     with SingleTickerProviderStateMixin {
+  final GlobalKey<ScaffoldState> _scaffold = GlobalKey<ScaffoldState>();
   AnimationController _animatedButtonController;
   SongPlayer songPlayer;
   @override
@@ -59,6 +64,7 @@ class _MusicPlayerScreenState extends State<MusicPlayerScreen>
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
     return Scaffold(
+      key: _scaffold,
       body: Selector<SongPlayer, LinearGradient>(
         selector: (_, s) => s.getGradientBackground,
         builder: (context, value, child) {
@@ -110,7 +116,7 @@ class _MusicPlayerScreenState extends State<MusicPlayerScreen>
                           Icons.more_vert_outlined,
                           color: Colors.white,
                         ),
-                        onPressed: null)
+                        onPressed: () => showMusicBottomSheet())
                   ],
                 ),
               ),
@@ -237,6 +243,123 @@ class _MusicPlayerScreenState extends State<MusicPlayerScreen>
     );
   }
 
+  showMusicBottomSheet() {
+    _scaffold.currentState.showBottomSheet((context) => ListView(
+          shrinkWrap: true,
+          children: [
+            ListTile(
+              leading: Icon(Icons.music_note),
+              title: Text(songPlayer.getLatestSongInfo.title),
+            ),
+            ListTile(
+              leading: Icon(Icons.lock_clock),
+              onTap: () {
+                double timeSliderValue = 0.0;
+                _scaffold.currentState.showBottomSheet((context) =>
+                    StatefulBuilder(
+                      builder: (context, state) => Container(
+                        height: 200,
+                        width: double.infinity,
+                        child: Center(
+                          child: Padding(
+                            padding: EdgeInsets.symmetric(
+                                horizontal: 20, vertical: 20),
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                              children: [
+                                timeSliderValue == 0.0
+                                    ? Text(
+                                        'Sleep Timer off',
+                                        style: Theme.of(context)
+                                            .textTheme
+                                            .headline6,
+                                      )
+                                    : RichText(
+                                        text: TextSpan(children: [
+                                        TextSpan(
+                                          text: 'Stop audio in ',
+                                          style: Theme.of(context)
+                                              .textTheme
+                                              .headline6,
+                                        ),
+                                        TextSpan(
+                                          text: '${timeSliderValue.round()}',
+                                          style: Theme.of(context)
+                                              .textTheme
+                                              .headline6
+                                              .copyWith(color: darkBlueColor),
+                                        ),
+                                        TextSpan(
+                                          text: ' min',
+                                          style: Theme.of(context)
+                                              .textTheme
+                                              .headline6,
+                                        )
+                                      ])),
+                                Column(
+                                  children: [
+                                    SliderTheme(
+                                      data: SliderThemeData(
+                                          overlayShape: RoundSliderOverlayShape(
+                                              overlayRadius: 2.0),
+                                          thumbShape: RoundSliderThumbShape(
+                                              enabledThumbRadius: 8.0,
+                                              disabledThumbRadius: 8.0),
+                                          activeTrackColor: darkBlueColor,
+                                          trackHeight: 4.0,
+                                          thumbColor: darkBlueColor),
+                                      child: Slider(
+                                          max: 90.0,
+                                          min: 0.0,
+                                          value: timeSliderValue,
+                                          onChanged: (value) {
+                                            state(() {
+                                              timeSliderValue = value;
+                                              songPlayer
+                                                  .setSleepTimer(value.round());
+                                            });
+                                          }),
+                                    ),
+                                    Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      children: audioTimers
+                                          .map((e) => Text(
+                                                e,
+                                                style: Theme.of(context)
+                                                    .textTheme
+                                                    .caption,
+                                              ))
+                                          .toList(),
+                                    )
+                                  ],
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                    ));
+              },
+              title: Text('Set Sleep Timer'),
+            ),
+            ListTile(
+              leading: Icon(Icons.share),
+              onTap: () async {
+                final filePath =
+                    await MediaStores.getPath(songPlayer.getLatestSongInfo.uri);
+                await Share.shareFiles(
+                  [filePath],
+                );
+              },
+              title: Text('Share'),
+            ),
+          ],
+        ));
+  }
+
+  final List<String> audioTimers = ['off', '30 min', '60 min', '90 min'];
+
   onChangingLoopMode(LoopMode mode) {
     switch (mode) {
       case LoopMode.off:
@@ -255,52 +378,5 @@ class _MusicPlayerScreenState extends State<MusicPlayerScreen>
         }
         break;
     }
-  }
-}
-
-class SongPlayerWidget extends StatelessWidget {
-  const SongPlayerWidget(
-      {Key key,
-      @required AnimationController animatedButtonController,
-      this.play,
-      this.next,
-      this.color,
-      this.previous})
-      : _animatedButtonController = animatedButtonController,
-        super(key: key);
-
-  final AnimationController _animatedButtonController;
-  final VoidCallback play;
-  final VoidCallback next;
-  final VoidCallback previous;
-  final Color color;
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceAround,
-      children: [
-        IconButton(
-            iconSize: 50,
-            icon: Icon(Icons.skip_previous_rounded),
-            onPressed: previous),
-        GestureDetector(
-          onTap: play,
-          child: Container(
-            height: 70,
-            width: 70,
-            decoration: BoxDecoration(shape: BoxShape.circle, color: color),
-            child: Center(
-              child: AnimatedIcon(
-                  size: 50,
-                  icon: AnimatedIcons.play_pause,
-                  progress: _animatedButtonController),
-            ),
-          ),
-        ),
-        IconButton(
-            iconSize: 50, icon: Icon(Icons.skip_next_rounded), onPressed: next),
-      ],
-    );
   }
 }

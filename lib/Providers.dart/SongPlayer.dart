@@ -1,12 +1,15 @@
+import 'dart:async';
 import 'dart:math';
 import 'dart:typed_data';
 
 import 'package:audio_service/audio_service.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:lit_player/Providers.dart/BackgroundTask.dart';
+import 'package:lit_player/utils.dart/SlideBottomWidget.dart';
 import 'package:lit_player/utils.dart/albumimageWidgte.dart';
 import 'package:lit_player/utils.dart/text_player_widget.dart';
 import 'package:marquee/marquee.dart';
@@ -24,6 +27,17 @@ class SongPlayer extends ChangeNotifier {
 
   factory SongPlayer() {
     return _singleton;
+  }
+  Timer sleepTimer;
+  setSleepTimer(int min) {
+    removeSleepTimer();
+    sleepTimer = Timer(Duration(minutes: min), () {
+      stop();
+    });
+  }
+
+  removeSleepTimer() {
+    if (sleepTimer?.isActive ?? false) sleepTimer.cancel();
   }
 
   SongPlayer._internal();
@@ -316,38 +330,13 @@ class SongPlayer extends ChangeNotifier {
 
   Widget smallPlayerTextWidget(SongInfo info, Size size, BuildContext context) {
     key = ValueKey(int.parse(info?.id ?? '0'));
-    if (latestSongInfo == null) {
-      return Shimmer.fromColors(
-          baseColor: Colors.grey[300],
-          highlightColor: Colors.grey[100],
-          child: Column(
-            children: [
-              Container(
-                height: 10.0,
-                width: double.infinity,
-                color: Colors.white,
-              ),
-              SizedBox(
-                height: 10,
-              ),
-              Container(
-                height: 10.0,
-                width: double.infinity,
-                color: Colors.white,
-              )
-            ],
-          ));
-    } else {
-      return TextPlayerWidget(
-        title: getLatestSongInfo.title,
-        artist: getLatestSongInfo.artist,
-        key: key,
-        fontSize: Theme.of(context).textTheme.subtitle1.fontSize,
-        titletTextColor: Theme.of(context).textTheme.subtitle1.color,
-        artisttextColor: Theme.of(context).textTheme.caption.color,
-        artistFontSize: Theme.of(context).textTheme.caption.fontSize,
-      );
-    }
+
+    return SmallTextPlayerWidget(
+      showShimmer: latestSongInfo == null ? true : false,
+      title: info.title,
+      artist: info.artist,
+      key: key,
+    );
   }
 
   Widget bigPlayerTextWidget(SongInfo info, Size size) {

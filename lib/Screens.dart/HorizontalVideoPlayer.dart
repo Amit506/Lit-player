@@ -7,11 +7,12 @@ import 'package:lit_player/Providers.dart/videoPlayerProvider.dart';
 import 'package:lit_player/main.dart';
 import 'package:lit_player/utils.dart/OverLayWidget.dart';
 import 'package:provider/provider.dart';
+import 'package:share/share.dart';
 import 'package:tuple/tuple.dart';
 import 'package:video_player/video_player.dart';
 
 class HorizontalVideoPlayer extends StatefulWidget {
-  final uri;
+  final String uri;
   const HorizontalVideoPlayer({Key key, this.uri}) : super(key: key);
 
   @override
@@ -30,7 +31,9 @@ class _HorizontalVideoPlayerState extends State<HorizontalVideoPlayer>
     _videoPlayerProvider =
         Provider.of<VideoPlayerProvider>(context, listen: false);
     _controller = _videoPlayerProvider.videocontroller;
-    _controller.initialize().then((_) => setState(() {}));
+    _controller.initialize().then((_) => setState(() {
+          _controller.play();
+        }));
 
     Provider.of<VideoPlayerProvider>(context, listen: false)
             .animatedButtonController =
@@ -38,7 +41,6 @@ class _HorizontalVideoPlayerState extends State<HorizontalVideoPlayer>
     _animatedButtonController =
         Provider.of<VideoPlayerProvider>(context, listen: false)
             .animatedButtonController;
-    if (_controller.value.isInitialized) _controller.play();
   }
 
   @override
@@ -56,6 +58,7 @@ class _HorizontalVideoPlayerState extends State<HorizontalVideoPlayer>
   @override
   void dispose() {
     super.dispose();
+    _videoPlayerProvider.videocontroller.dispose();
     AutoOrientation.portraitUpMode();
   }
 
@@ -68,12 +71,17 @@ class _HorizontalVideoPlayerState extends State<HorizontalVideoPlayer>
     final videoProvider =
         Provider.of<VideoPlayerProvider>(context, listen: false);
     return Scaffold(
-      backgroundColor: Colors.black,
+      backgroundColor: Colors.black87,
       body: Center(
         child: SizedBox(
           child: AspectRatio(
             aspectRatio: _controller.value.aspectRatio,
             child: GestureDetector(
+              onLongPress: () async {
+                await Share.shareFiles(
+                  [widget.uri],
+                );
+              },
               onDoubleTap: () {},
               behavior: HitTestBehavior.opaque,
               onDoubleTapDown: (value) => onDoubleTap(value, videoProvider),

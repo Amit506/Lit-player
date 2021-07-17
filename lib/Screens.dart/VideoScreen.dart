@@ -14,6 +14,7 @@ import 'package:media_stores/videoInfo.dart';
 import 'package:provider/provider.dart';
 
 import 'package:lit_player/utils.dart/getDuration.dart';
+import 'package:share/share.dart';
 
 class VideoListScreen extends StatefulWidget {
   const VideoListScreen({Key key}) : super(key: key);
@@ -87,6 +88,12 @@ class _VideoListScreenState extends State<VideoListScreen> {
                 shrinkWrap: true,
                 itemBuilder: (context, i) {
                   return ListTile(
+                    onLongPress: () async {
+                      final filePath = await MediaStores.getPath(videos[i].uri);
+                      await Share.shareFiles(
+                        [filePath],
+                      );
+                    },
                     onTap: () async {
                       final filePath = await MediaStores.getPath(videos[i].uri);
 
