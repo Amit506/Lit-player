@@ -31,11 +31,6 @@ class _HorizontalVideoPlayerState extends State<HorizontalVideoPlayer>
     _videoPlayerProvider =
         Provider.of<VideoPlayerProvider>(context, listen: false);
     _controller = _videoPlayerProvider.videocontroller;
-    _controller.initialize().then((_) => setState(() {
-          _controller.play();
-
-        }));
-
     Provider.of<VideoPlayerProvider>(context, listen: false)
             .animatedButtonController =
         AnimationController(vsync: this, duration: Duration(milliseconds: 500));
@@ -43,18 +38,24 @@ class _HorizontalVideoPlayerState extends State<HorizontalVideoPlayer>
     _animatedButtonController =
         Provider.of<VideoPlayerProvider>(context, listen: false)
             .animatedButtonController;
+    _controller.initialize().then((_) => setState(() {
+          _controller.play();
+          _animatedButtonController.forward();
+          Provider.of<VideoPlayerProvider>(context, listen: false)
+              .hideOverLay();
+        }));
   }
 
   @override
   void didUpdateWidget(covariant HorizontalVideoPlayer oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (!_controller.value.isPlaying) _animatedButtonController.forward();
+    if (!_controller.value.isPlaying) _animatedButtonController.reverse();
   }
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    if (!_controller.value.isPlaying) _animatedButtonController.forward();
+    if (!_controller.value.isPlaying) _animatedButtonController.reverse();
   }
 
   @override

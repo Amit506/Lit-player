@@ -60,18 +60,18 @@ class SongsService extends ChangeNotifier {
     }
   }
 
-  Future<Uint8List> getQualityThumbnail(int index, int id) async {
-    final bitmap = await MediaStores.bitMap(id, width: 500, height: 500)
-        .onError((error, stackTrace) {
-      print(error.toString());
-      return null;
-    });
-    return bitmap;
-  }
+  // Future<Uint8List> getQualityThumbnail(int index, int id) async {
+  //   final bitmap = await MediaStores.bitMap(id, width: 500, height: 500)
+  //       .onError((error, stackTrace) {
+  //     print(error.toString());
+  //     return null;
+  //   });
+  //   return bitmap;
+  // }
 }
 
 class Thumbnail {
-  static Future<Uint8List> getQualityThumbnail(int index, int id) async {
+  static Future<Uint8List> getQualityThumbnail(int id) async {
     final bitmap = await MediaStores.bitMap(id, width: 500, height: 650)
         .onError((error, stackTrace) {
       print(error.toString());

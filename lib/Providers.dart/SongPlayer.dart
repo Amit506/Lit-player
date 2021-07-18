@@ -6,6 +6,8 @@ import 'package:audio_service/audio_service.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:flutter/services.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:lit_player/Providers.dart/BackgroundTask.dart';
@@ -187,11 +189,11 @@ class SongPlayer extends ChangeNotifier {
 
   indexesStream() async {
     player.currentIndexStream.listen((event) async {
-      if(getCurrentPlayList.length!=0) {
+      if (getCurrentPlayList.length != 0) {
         print('-------------' + event.toString());
         key = ValueKey(event);
         final image = await Thumbnail.getQualityThumbnail(
-            event, int.parse(getCurrentPlayList[event].id));
+            int.parse(getCurrentPlayList[event].id));
 
         await generatebackGroundColor(image);
 
@@ -341,7 +343,7 @@ class SongPlayer extends ChangeNotifier {
   }
 
   Widget smallPlayerTextWidget(SongInfo info, Size size, BuildContext context) {
-    key = ValueKey(int.parse(info==null? '0':info.id));
+    key = ValueKey(int.parse(info == null ? '0' : info.id));
 
     return SmallTextPlayerWidget(
       showShimmer: info == null ? true : false,

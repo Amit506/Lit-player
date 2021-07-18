@@ -88,6 +88,7 @@ class VideoPlayerProvider extends ChangeNotifier {
 
   void setOverLayOnEnd() {
     showOverLay = true;
+
     notifyListeners();
   }
 
@@ -98,10 +99,7 @@ class VideoPlayerProvider extends ChangeNotifier {
 
   void hideOverLay() {
     removeTimer();
-    Future.delayed(Duration(seconds: 1), () {
-      showOverLay = false;
-      notifyListeners();
-    });
+    setTimer();
   }
 
   setTimer() {
@@ -126,7 +124,7 @@ class VideoPlayerProvider extends ChangeNotifier {
     videocontroller.addListener(() {
       if (videocontroller.value.position.inSeconds ==
           videocontroller.value.duration.inSeconds) {
-        animatedButtonController.forward();
+        animatedButtonController.reverse();
         setOverLayOnEnd();
         notifyListeners();
       }
