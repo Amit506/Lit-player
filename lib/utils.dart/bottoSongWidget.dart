@@ -65,7 +65,10 @@ class BottomSongWidget extends StatelessWidget {
               children: [
                 SizedBox(
                   width: size.width * 0.2,
-                  child: Hero(
+                  child: FittedBox(
+                    clipBehavior: Clip.antiAlias,
+                    fit: BoxFit.cover,
+                    child:Hero(
                     tag: "a",
                     child: Selector<SongPlayer, Widget>(
                       selector: (_, changer) => changer.getCurrentWidget,
@@ -74,6 +77,7 @@ class BottomSongWidget extends StatelessWidget {
                         child: data,
                       ),
                     ),
+                  ),
                   ),
                 ),
                 Expanded(

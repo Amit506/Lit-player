@@ -116,19 +116,20 @@ class _OverLayVideoWidgetState extends State<OverLayVideoWidget>
                   onTap: videoProvider.showOverLay
                       ? () async {
                           if (widget.videoPlayerController.value.isPlaying) {
-                            videoProvider.animatedButtonController.forward();
+                            videoProvider.animatedButtonController.reverse();
                             await widget.videoPlayerController.pause();
                             videoProvider.hideOverLay();
                           } else {
                             await widget.videoPlayerController.play();
-                            videoProvider.animatedButtonController.reverse();
+                            videoProvider.animatedButtonController.forward();
+
                             videoProvider.hideOverLay();
                           }
                         }
                       : null,
                   child: AnimatedIcon(
                       size: 60,
-                      icon: AnimatedIcons.pause_play,
+                      icon: AnimatedIcons.play_pause,
                       progress: videoProvider.animatedButtonController),
                 ),
               ),

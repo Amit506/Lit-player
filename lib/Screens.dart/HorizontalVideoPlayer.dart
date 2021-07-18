@@ -33,11 +33,13 @@ class _HorizontalVideoPlayerState extends State<HorizontalVideoPlayer>
     _controller = _videoPlayerProvider.videocontroller;
     _controller.initialize().then((_) => setState(() {
           _controller.play();
+
         }));
 
     Provider.of<VideoPlayerProvider>(context, listen: false)
             .animatedButtonController =
         AnimationController(vsync: this, duration: Duration(milliseconds: 500));
+
     _animatedButtonController =
         Provider.of<VideoPlayerProvider>(context, listen: false)
             .animatedButtonController;

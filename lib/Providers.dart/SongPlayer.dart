@@ -187,21 +187,23 @@ class SongPlayer extends ChangeNotifier {
 
   indexesStream() async {
     player.currentIndexStream.listen((event) async {
-      print('-------------' + event.toString());
-      key = ValueKey(event);
-      final image = await Thumbnail.getQualityThumbnail(
-          event, int.parse(getCurrentPlayList[event].id));
+      if(getCurrentPlayList.length!=0) {
+        print('-------------' + event.toString());
+        key = ValueKey(event);
+        final image = await Thumbnail.getQualityThumbnail(
+            event, int.parse(getCurrentPlayList[event].id));
 
-      await generatebackGroundColor(image);
+        await generatebackGroundColor(image);
 
-      setCurrentWidget = AlbumImageWidget(
-        memeoryImage: image,
-        key: key,
-      );
+        setCurrentWidget = AlbumImageWidget(
+          memeoryImage: image,
+          key: key,
+        );
 
-      latestSongInfo = getCurrentPlayList[event];
-      notifyListeners();
-      setSliderValues();
+        latestSongInfo = getCurrentPlayList[event];
+        notifyListeners();
+        setSliderValues();
+      }
     });
   }
 
@@ -339,12 +341,12 @@ class SongPlayer extends ChangeNotifier {
   }
 
   Widget smallPlayerTextWidget(SongInfo info, Size size, BuildContext context) {
-    key = ValueKey(int.parse(info?.id ?? '0'));
+    key = ValueKey(int.parse(info==null? '0':info.id));
 
     return SmallTextPlayerWidget(
-      showShimmer: latestSongInfo == null ? true : false,
-      title: info.title,
-      artist: info.artist,
+      showShimmer: info == null ? true : false,
+      title: info?.title,
+      artist: info?.artist,
       key: key,
     );
   }

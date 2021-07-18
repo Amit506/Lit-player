@@ -1,4 +1,4 @@
-package com.example.lit_player
+package com.lit_player
 
 import io.flutter.embedding.android.FlutterActivity
 

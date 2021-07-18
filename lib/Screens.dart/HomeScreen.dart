@@ -177,20 +177,18 @@ class _HomeScreenState extends State<HomeScreen>
                           },
                           leading: FittedBox(
                             fit: BoxFit.cover,
-                            child: AnimatedSwitcher(
-                              duration: Duration(milliseconds: 500),
-                              child: Selector<SongsService, List<SongInfo>>(
-                                  selector: (_, changer) =>
-                                      changer.songShowList,
-                                  builder: (_, data, child) {
-                                    Widget animatedSwitcherChild =
-                                        data[i].imageBit != null
-                                            ? AlbumArtAvatar(
-                                                image: data[i].imageBit)
-                                            : Tempavatar();
-                                    return animatedSwitcherChild;
-                                  }),
-                            ),
+                            child: Selector<SongsService, List<SongInfo>>(
+                                selector: (_, changer) => changer.songShowList,
+                                builder: (_, data, child) {
+                                  Widget animatedSwitcherChild = data[i]
+                                              .imageBit !=
+                                          null
+                                      ? AlbumArtAvatar(image: data[i].imageBit)
+                                      : Tempavatar();
+                                  return AnimatedSwitcher(
+                                      duration: Duration(milliseconds: 500),
+                                      child: animatedSwitcherChild);
+                                }),
                           ),
                           title: Text(songs[i].title),
                         );
@@ -213,30 +211,28 @@ class _HomeScreenState extends State<HomeScreen>
               //   ),
               // ),
 
-              AnimatedPositioned(
-                duration: Duration(seconds: 1),
-                child: Align(
-                  alignment: Alignment.bottomCenter,
-                  child: Container(
-                      child: BottomSongWidget(
-                        onPanUpdate: (value) {
-                          final direction = value.velocity.pixelsPerSecond.dx;
-                          if (direction > 0) {
-                            songPlayer.playNext();
-                          } else {
-                            songPlayer.playPrevious();
-                          }
-                        },
-                        size: size,
-                        animatedButtonController: _animatedButtonController,
-                      ),
-                      height: 80,
-                      width: size.width,
-                      color: Colors.white),
-                ),
+              Align(
+                alignment: Alignment.bottomCenter,
+                child: SizedBox(
+                    child: BottomSongWidget(
+                      onPanUpdate: (value) {
+                        final direction = value.velocity.pixelsPerSecond.dx;
+                        if (direction > 0) {
+                          songPlayer.playNext();
+                        } else {
+                          songPlayer.playPrevious();
+                        }
+                      },
+                      size: size,
+                      animatedButtonController: _animatedButtonController,
+                    ),
+                    height: 80,
+                    width: size.width,
+                    ),
               ),
             ],
-          )),
+          )
+      ),
     );
   }
 
