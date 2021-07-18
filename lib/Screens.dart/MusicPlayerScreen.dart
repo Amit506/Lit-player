@@ -7,8 +7,7 @@ import 'package:lit_player/Providers.dart/song.dart';
 import 'package:lit_player/Theme.dart/appTheme.dart';
 import 'package:lit_player/utils.dart/SongPlayerwidget.dart';
 import 'package:lit_player/utils.dart/getDuration.dart';
-// import 'package:lit_player/Tuple.dart';
-import 'package:marquee/marquee.dart';
+
 import 'package:media_stores/SongInfo.dart';
 import 'package:media_stores/media_stores.dart';
 import 'package:provider/provider.dart';
@@ -25,7 +24,7 @@ class MusicPlayerScreen extends StatefulWidget {
 }
 
 class _MusicPlayerScreenState extends State<MusicPlayerScreen>
-    with SingleTickerProviderStateMixin {
+    with TickerProviderStateMixin {
   final GlobalKey<ScaffoldState> _scaffold = GlobalKey<ScaffoldState>();
   AnimationController _animatedButtonController;
   SongPlayer songPlayer;
@@ -55,6 +54,28 @@ class _MusicPlayerScreenState extends State<MusicPlayerScreen>
   }
 
   @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (Provider.of<SongPlayer>(context, listen: false).isPlaying) {
+      print('---isplaying');
+      _animatedButtonController.forward();
+    } else if (!Provider.of<SongPlayer>(context, listen: false).isPlaying) {
+      _animatedButtonController.reverse();
+    }
+  }
+  // @override
+  // void didChangeAppLifecycleState(AppLifecycleState state) {
+  //   if (state == AppLifecycleState.resumed) {
+  //     if (Provider.of<SongPlayer>(context, listen: false).isPlaying) {
+  //       print('---isplaying');
+  //       _animatedButtonController.forward();
+  //     } else if (!Provider.of<SongPlayer>(context, listen: false).isPlaying) {
+  //       _animatedButtonController.reverse();
+  //     }
+  //   }
+  // }
+
+  @override
   void dispose() {
     _animatedButtonController.dispose();
     super.dispose();
@@ -68,6 +89,7 @@ class _MusicPlayerScreenState extends State<MusicPlayerScreen>
       body: Selector<SongPlayer, LinearGradient>(
         selector: (_, s) => s.getGradientBackground,
         builder: (context, value, child) {
+          print("builder music screeb--");
           return DecoratedBox(
               decoration: BoxDecoration(
                 gradient: value ?? null,

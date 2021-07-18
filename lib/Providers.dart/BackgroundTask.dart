@@ -1,5 +1,4 @@
 import 'package:audio_service/audio_service.dart';
-import 'package:just_audio/just_audio.dart';
 import 'package:lit_player/Providers.dart/SongPlayer.dart';
 
 class AudioPlayerTask extends BackgroundAudioTask {
@@ -35,6 +34,8 @@ class AudioPlayerTask extends BackgroundAudioTask {
 
   @override
   Future<void> onStop() async {
+    print(
+        "stop..................................................................");
     AudioServiceBackground.setState(
         controls: [],
         playing: false,
@@ -45,6 +46,8 @@ class AudioPlayerTask extends BackgroundAudioTask {
 
   @override
   Future<void> onPause() async {
+    print(
+        "pauseddd..................................................................");
     AudioServiceBackground.setState(controls: [
       MediaControl.play,
       MediaControl.stop,
@@ -57,6 +60,8 @@ class AudioPlayerTask extends BackgroundAudioTask {
 
   @override
   Future<void> onPlay() async {
+    print(
+        "play..................................................................");
     AudioServiceBackground.setState(controls: [
       MediaControl.pause,
       MediaControl.stop,

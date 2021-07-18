@@ -2,10 +2,12 @@ import 'dart:typed_data';
 
 import 'package:flutter/cupertino.dart';
 import 'package:lit_player/Providers.dart/FetchData.dart';
+import 'package:lit_player/Providers.dart/SongPlayer.dart';
 import 'package:media_stores/SongInfo.dart';
 import 'package:media_stores/media_stores.dart';
 
 class SongsService extends ChangeNotifier {
+  final SongPlayer _songPlayer = SongPlayer();
   List<SongInfo> songInfoList = [];
   List<SongInfo> songShowList = [];
   // ValueNotifier<List<Uint8List>> songThumbnails = ValueNotifier(<Uint8List>[]);
@@ -17,7 +19,11 @@ class SongsService extends ChangeNotifier {
   set setCurrentSong(SongInfo currentSong) => this.currentSong = currentSong;
   void initState() async {
     songInfoList = await MediaStores.getSongs();
-
+    if (songInfoList.length > 0) {
+      _songPlayer.setLatestSongInfo = songInfoList[0];
+      _songPlayer.setCurrentPlayList = songInfoList;
+      _songPlayer.playerSetAudioSoucres(songInfoList);
+    }
     updateSongShowList(0, songInfoList.length < 20 ? songInfoList.length : 20);
   }
 

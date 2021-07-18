@@ -22,11 +22,12 @@ class BottomSongWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final songPlayer = Provider.of<SongPlayer>(context, listen: false);
-    if (songPlayer.isPlaying) {
-      _animatedButtonController.forward();
-    } else if (!songPlayer.isPlaying) {
-      _animatedButtonController.reverse();
-    }
+    // if (songPlayer.isPlaying) {
+    //   print('---isplaying');
+    //   _animatedButtonController.forward();
+    // } else if (!songPlayer.isPlaying) {
+    //   _animatedButtonController.reverse();
+    // }
     return Material(
       color: Theme.of(context).primaryColor,
       child: Column(

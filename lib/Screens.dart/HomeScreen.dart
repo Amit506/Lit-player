@@ -22,34 +22,34 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen>
-    with SingleTickerProviderStateMixin, WidgetsBindingObserver {
+    with TickerProviderStateMixin, WidgetsBindingObserver {
   AnimationController _animatedButtonController;
   @override
   void initState() {
     super.initState();
-    initiating();
+
     WidgetsBinding.instance.addObserver(this);
-    AudioService.connect();
-    WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
-      initAudioService();
-    });
+
+    initiating();
 
     _animatedButtonController =
         AnimationController(vsync: this, duration: Duration(milliseconds: 500));
   }
 
   @override
-  void dispose() {
-    AudioService.disconnect();
-    WidgetsBinding.instance.removeObserver(this);
-    super.dispose();
-  }
-
-  @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     switch (state) {
       case AppLifecycleState.resumed:
-        AudioService.connect();
+        {
+          if (Provider.of<SongPlayer>(context, listen: false).isPlaying) {
+            print('---isplaying');
+            _animatedButtonController.forward();
+          } else if (!Provider.of<SongPlayer>(context, listen: false)
+              .isPlaying) {
+            _animatedButtonController.reverse();
+          }
+          AudioService.connect();
+        }
         break;
       case AppLifecycleState.paused:
         AudioService.disconnect();
@@ -57,6 +57,31 @@ class _HomeScreenState extends State<HomeScreen>
       default:
         break;
     }
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (Provider.of<SongPlayer>(context, listen: false).isPlaying) {
+      print('---isplaying');
+      _animatedButtonController.forward();
+    } else if (!Provider.of<SongPlayer>(context, listen: false).isPlaying) {
+      _animatedButtonController.reverse();
+    }
+  }
+
+  @override
+  Future<bool> didPopRoute() async {
+    AudioService.disconnect();
+    return false;
+  }
+
+  @override
+  void dispose() {
+    AudioService.disconnect();
+    WidgetsBinding.instance.addObserver(this);
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
   }
 
   bool onlyOneDrag = true;
@@ -70,6 +95,10 @@ class _HomeScreenState extends State<HomeScreen>
     return Scaffold(
       appBar: AppBar(
         actions: [
+          IconButton(
+              icon: Icon(Icons.nightlight_round),
+              onPressed: () =>
+                  Provider.of<AppTheme>(context, listen: false).changeTheme()),
           IconButton(
               icon: Icon(Icons.video_collection_rounded),
               onPressed: () {
@@ -170,30 +199,20 @@ class _HomeScreenState extends State<HomeScreen>
                   );
                 }
               }),
-              Positioned(
-                top: size.height / 2,
-                right: 0.0,
-                child: Transform.rotate(
-                  angle: -pi / 2,
-                  alignment: Alignment.centerRight,
-                  child: ClipPath(
-                      clipper: CustomHalfCircleClipper(),
-                      child: CircleAvatar(
-                        radius: 30,
-                      )),
-                ),
-              ),
-              Positioned(
-                right: 0,
-                top: size.height / 2 + 30 + 16,
-                child: Transform.rotate(
-                  angle: pi + pi / 20,
-                  child: GestureDetector(
-                      onTap: () => Provider.of<AppTheme>(context, listen: false)
-                          .changeTheme(),
-                      child: Icon(Icons.nightlight_round)),
-                ),
-              ),
+              // Positioned(
+              //   top: size.height / 2,
+              //   right: 0.0,
+              //   child: Transform.rotate(
+              //     angle: -pi / 2,
+              //     alignment: Alignment.centerRight,
+              //     child: ClipPath(
+              //         clipper: CustomHalfCircleClipper(),
+              //         child: CircleAvatar(
+              //           radius: 30,
+              //         )),
+              //   ),
+              // ),
+
               AnimatedPositioned(
                 duration: Duration(seconds: 1),
                 child: Align(
@@ -221,41 +240,29 @@ class _HomeScreenState extends State<HomeScreen>
     );
   }
 
-  gotToMusicScreen() async {}
-
   void initiating() async {
-    Provider.of<SongPlayer>(context, listen: false).setLatestSongInfo =
-        Provider.of<SongsService>(context, listen: false)
-            .allPlaysListAvailable[0];
-    Provider.of<SongPlayer>(context, listen: false).setCurrentPlayList =
-        Provider.of<SongsService>(context, listen: false).allPlaysListAvailable;
-    await Provider.of<SongPlayer>(context, listen: false).playerSetAudioSoucres(
-      Provider.of<SongsService>(context, listen: false).allPlaysListAvailable,
-    );
-
-    Provider.of<SongPlayer>(context, listen: false).indexesStream();
-    Provider.of<SongPlayer>(context, listen: false).sequenceStateChange();
-    Provider.of<SongPlayer>(context, listen: false).listenStream();
-    Provider.of<SongPlayer>(context, listen: false).initiatingBackGroundTask();
-    // Provider.of<SongPlayer>(context, listen: false).convertToMediaItems();
-    // Provider.of<SongPlayer>(context, listen: false).initiatingBackGroundTask();
-  }
-
-  void initAudioService() async {}
-}
-
-class CustomHalfCircleClipper extends CustomClipper<Path> {
-  @override
-  Path getClip(Size size) {
-    final Path path = new Path();
-    path.lineTo(0.0, size.height / 2);
-    path.lineTo(size.width, size.height / 2);
-    path.lineTo(size.width, 0);
-    return path;
-  }
-
-  @override
-  bool shouldReclip(CustomClipper<Path> oldClipper) {
-    return true;
+    AudioService.connect();
+    Provider.of<SongPlayer>(context, listen: false)
+      ..indexesStream()
+      ..sequenceStateChange()
+      ..listenStream()
+      ..initiatingBackGroundTask()
+      ..playerState();
   }
 }
+
+// class CustomHalfCircleClipper extends CustomClipper<Path> {
+//   @override
+//   Path getClip(Size size) {
+//     final Path path = new Path();
+//     path.lineTo(0.0, size.height / 2);
+//     path.lineTo(size.width, size.height / 2);
+//     path.lineTo(size.width, 0);
+//     return path;
+//   }
+
+//   @override
+//   bool shouldReclip(CustomClipper<Path> oldClipper) {
+//     return true;
+//   }
+// }

@@ -4,7 +4,7 @@ import 'package:lit_player/Providers.dart/VideoService.dart';
 import 'package:lit_player/Providers.dart/song.dart';
 import 'package:lit_player/Screens.dart/HomeScreen.dart';
 import 'package:lit_player/Theme.dart/appTheme.dart';
-import 'package:media_stores/media_stores.dart';
+
 import 'package:provider/provider.dart';
 
 class SplashScreen extends StatefulWidget {

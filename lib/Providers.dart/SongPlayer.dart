@@ -150,7 +150,10 @@ class SongPlayer extends ChangeNotifier {
 
   play() async {
     await player.play();
-    AudioService.play();
+    await AudioService.playMediaItem(MediaItem(
+        id: latestSongInfo.id,
+        album: latestSongInfo.album,
+        title: latestSongInfo.title));
     notifyListeners();
   }
 
@@ -217,7 +220,14 @@ class SongPlayer extends ChangeNotifier {
   }
 
   playerState() {
-    player.playerStateStream.listen((event) {});
+    player.playerStateStream.listen((event) {
+      print(AudioService.currentMediaItem);
+      if (event.playing)
+        AudioService.play();
+      else {
+        AudioService.pause();
+      }
+    });
   }
 
   Future playerSetAudioSoucres(List<SongInfo> songInfo,
@@ -353,12 +363,13 @@ class SongPlayer extends ChangeNotifier {
     );
   }
 
-  playButtonAnimation(AnimationController playButton) {
+  playButtonAnimation(AnimationController playButton) async {
     if (player.playing) {
       playButton.reverse();
       player.pause();
     } else {
       player.play();
+
       playButton.forward();
     }
     notifyListeners();
@@ -379,17 +390,37 @@ class SongPlayer extends ChangeNotifier {
 //             id: e.id, album: e.album, title: e.title, artist: e.artist))
 //         .toList();
 //   }
+  List<MediaItem> get mediaItem => getCurrentPlayList
+      .map<MediaItem>((e) => MediaItem(
+          id: e.id,
+          album: e.album,
+          title: e.title,
+          duration: Duration(milliseconds: int.parse(e.duration))))
+      .toList();
 
   initiatingBackGroundTask() async {
     await AudioService.start(
+            androidEnableQueue: true,
             backgroundTaskEntrypoint: _backgroundTaskEntrypoint)
-        .then((value) {
-      print("----------------------------------" + value.toString());
+        .then((value) async {
+      // AudioService.playbackStateStream.listen((event) {
+
+      // });
+//       print("initiating background task");
+// // AudioService.
+//       print('isAudioSevice connected' + AudioService.connected.toString());
+//       print(AudioService.currentMediaItem);
+//       await AudioService.addQueueItems(mediaItem);
+//       await AudioServiceBackground.setMediaItem(mediaItem[0]);
+//       print("000000000000000000000");
+//       print("----------------------------------" + value.toString());
       AudioService.playbackStateStream.listen((event) {
-        print(event.playing);
+        print('-------------------------------------------' +
+            event.playing.toString());
         // setIsBackGroundAudioPlaying = event.playing;
       });
     });
+
 //     Thumbnail.getQualityThumbnail(0,  getCurrentPlayList[0].id);
 // final media = MediaItem(id: getCurrentPlayList[0].id, album:getCurrentPlayList[0]. album, title: getCurrentPlayList[0].title,bitMap: getCurrentPlayList[0])
 //     AudioServiceBackground.setMediaItem(getCurrentPlayList[isPlaying])
