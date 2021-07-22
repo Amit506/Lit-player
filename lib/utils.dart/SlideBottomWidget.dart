@@ -38,33 +38,15 @@ class SmallTextPlayerWidget extends StatelessWidget {
   final bool showShimmer;
   final String title;
   final String artist;
+  final Widget child;
   const SmallTextPlayerWidget(
-      {Key key, this.showShimmer, this.title, this.artist})
+      {Key key, this.showShimmer, this.title, this.artist, this.child})
       : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return showShimmer
-        ? Shimmer.fromColors(
-            baseColor: Colors.grey[300],
-            highlightColor: Colors.grey[100],
-            child: Column(
-              children: [
-                Container(
-                  height: 10.0,
-                  width: double.infinity,
-                  color: Colors.white,
-                ),
-                SizedBox(
-                  height: 10,
-                ),
-                Container(
-                  height: 10.0,
-                  width: double.infinity,
-                  color: Colors.white,
-                )
-              ],
-            ))
+        ? child
         : TextPlayerWidget(
             title: title,
             artist: artist,

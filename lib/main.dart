@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:lit_player/Providers.dart/SearchProvider.dart';
 import 'package:lit_player/Providers.dart/SongPlayer.dart';
@@ -8,7 +7,6 @@ import 'package:lit_player/Providers.dart/videoPlayerProvider.dart';
 import 'package:lit_player/Screens.dart/SplashScreen.dart';
 import 'package:lit_player/Theme.dart/appTheme.dart';
 import 'package:provider/provider.dart';
-
 
 void main() {
   runApp(ChangeNotifierProvider<AppTheme>(

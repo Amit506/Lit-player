@@ -62,7 +62,6 @@ class _OverLayVideoWidgetState extends State<OverLayVideoWidget>
   Widget build(BuildContext context) {
     final videoProvider = Provider.of<VideoPlayerProvider>(context);
     return LayoutBuilder(builder: (_, constraint) {
-      print(videoProvider.videocontroller.value.aspectRatio);
       print("constraint" +
           constraint.maxWidth.toString() +
           " " +

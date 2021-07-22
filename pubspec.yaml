@@ -31,7 +31,9 @@ dependencies:
   auto_orientation: ^2.0.2
   cupertino_icons: ^1.0.2
   favorite_button: ^0.0.4
+  flutter_isolate: null
   flutter_tts: ^3.1.0
+  isolate_handler: ^1.0.0
   just_audio: ^0.8.0
   marquee: ^2.2.0
   palette_generator: ^0.3.0
@@ -40,7 +42,6 @@ dependencies:
   shimmer: ^2.0.0
   tuple: ^2.0.0
   video_player: ^2.1.10
-  change_app_package_name:
 
 dev_dependencies:
   flutter_test:

@@ -126,6 +126,8 @@ class _HomeScreenState extends State<HomeScreen>
           child: Stack(
             children: [
               Consumer<SongsService>(builder: (context, value, child) {
+                print(
+                    "called...........................................................");
                 if (value.songShowList != null &&
                     value.songShowList.length == 0) {
                   return Center(
@@ -153,9 +155,10 @@ class _HomeScreenState extends State<HomeScreen>
                         return ListTile(
                           trailing: Selector<SongPlayer, SongInfo>(
                             child: SizedBox(
-                                height: 20,
-                                width: 30,
-                                child: VisualizerWidget()),
+                              height: 20,
+                              width: 30,
+                              // child: VisualizerWidget()
+                            ),
                             selector: (_, s) => s.latestSongInfo,
                             builder: (context, value, child) {
                               if (value == songs[i]) {
@@ -214,25 +217,24 @@ class _HomeScreenState extends State<HomeScreen>
               Align(
                 alignment: Alignment.bottomCenter,
                 child: SizedBox(
-                    child: BottomSongWidget(
-                      onPanUpdate: (value) {
-                        final direction = value.velocity.pixelsPerSecond.dx;
-                        if (direction > 0) {
-                          songPlayer.playNext();
-                        } else {
-                          songPlayer.playPrevious();
-                        }
-                      },
-                      size: size,
-                      animatedButtonController: _animatedButtonController,
-                    ),
-                    height: 80,
-                    width: size.width,
-                    ),
+                  child: BottomSongWidget(
+                    onPanUpdate: (value) {
+                      final direction = value.velocity.pixelsPerSecond.dx;
+                      if (direction > 0) {
+                        songPlayer.playNext();
+                      } else {
+                        songPlayer.playPrevious();
+                      }
+                    },
+                    size: size,
+                    animatedButtonController: _animatedButtonController,
+                  ),
+                  height: 80,
+                  width: size.width,
+                ),
               ),
             ],
-          )
-      ),
+          )),
     );
   }
 

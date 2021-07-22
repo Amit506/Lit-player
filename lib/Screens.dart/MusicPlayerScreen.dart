@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import 'package:favorite_button/favorite_button.dart';
 import 'package:flutter/material.dart';
 
@@ -6,7 +8,9 @@ import 'package:lit_player/Providers.dart/SongPlayer.dart';
 import 'package:lit_player/Providers.dart/song.dart';
 import 'package:lit_player/Theme.dart/appTheme.dart';
 import 'package:lit_player/utils.dart/SongPlayerwidget.dart';
+import 'package:lit_player/utils.dart/albumimageWidgte.dart';
 import 'package:lit_player/utils.dart/getDuration.dart';
+import 'package:lit_player/utils.dart/text_player_widget.dart';
 
 import 'package:media_stores/SongInfo.dart';
 import 'package:media_stores/media_stores.dart';
@@ -112,6 +116,8 @@ class _MusicPlayerScreenState extends State<MusicPlayerScreen>
                   children: [
                     Flexible(
                       child: Selector<SongPlayer, SongInfo>(
+                        shouldRebuild: (previous, next) =>
+                            next.title != previous.title,
                         selector: (_, changer) => changer.getLatestSongInfo,
                         builder: (_, data, child) => AnimatedSwitcher(
                           transitionBuilder: (child, animation) {
@@ -128,7 +134,15 @@ class _MusicPlayerScreenState extends State<MusicPlayerScreen>
                             return currentChild;
                           },
                           duration: Duration(milliseconds: 500),
-                          child: songPlayer.bigPlayerTextWidget(data, size),
+                          child: TextPlayerWidget(
+                            title: data.title,
+                            artist: data.artist,
+                            key: ValueKey(data.hashCode),
+                            fontSize: 22.0,
+                            titletTextColor: Colors.white,
+                            artisttextColor: Colors.white,
+                            artistFontSize: 15,
+                          ),
                         ),
                       ),
                     ),
@@ -150,11 +164,11 @@ class _MusicPlayerScreenState extends State<MusicPlayerScreen>
                 child: SizedBox(
                   width: size.width * 0.8,
                   height: size.height * 0.5,
-                  child: Selector<SongPlayer, Widget>(
-                    selector: (_, changer) => changer.getCurrentWidget,
-                    builder: (_, data, child) => FittedBox(
-                      fit: BoxFit.contain,
-                      child: AnimatedSwitcher(
+                  child: FittedBox(
+                    fit: BoxFit.contain,
+                    child: Selector<SongPlayer, Uint8List>(
+                      selector: (_, changer) => changer.imageByte,
+                      builder: (_, data, child) => AnimatedSwitcher(
                         transitionBuilder: (child, animation) {
                           final offsetAnimation = Tween<Offset>(
                                   begin: Offset(1.0, 0.0), end: Offset.zero)
@@ -170,7 +184,9 @@ class _MusicPlayerScreenState extends State<MusicPlayerScreen>
                           );
                         },
                         duration: Duration(milliseconds: 500),
-                        child: data,
+                        child: AlbumImageWidget(
+                          memeoryImage: data,
+                        ),
                       ),
                     ),
                   ),

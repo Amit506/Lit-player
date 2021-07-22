@@ -1,4 +1,6 @@
 import 'dart:async';
+import 'dart:developer';
+import 'dart:isolate';
 import 'dart:math';
 import 'dart:typed_data';
 
@@ -9,6 +11,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter/services.dart';
+import 'package:isolate_handler/isolate_handler.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:lit_player/Providers.dart/BackgroundTask.dart';
 import 'package:lit_player/utils.dart/SlideBottomWidget.dart';
@@ -16,6 +19,7 @@ import 'package:lit_player/utils.dart/albumimageWidgte.dart';
 import 'package:lit_player/utils.dart/text_player_widget.dart';
 import 'package:marquee/marquee.dart';
 import 'package:media_stores/SongInfo.dart';
+import 'package:media_stores/media_stores.dart';
 import 'package:palette_generator/palette_generator.dart';
 import 'package:shimmer/shimmer.dart';
 import './song.dart';
@@ -23,6 +27,7 @@ import './song.dart';
 const universalImage = 'assets/SPACE_album-mock.jpg';
 
 class SongPlayer extends ChangeNotifier {
+  final isolates = IsolateHandler();
   static AudioPlayer player = AudioPlayer();
   static final SongPlayer _singleton = SongPlayer._internal();
   final backgroundAudioPlayer = AudioPlayerTask();
@@ -43,23 +48,24 @@ class SongPlayer extends ChangeNotifier {
   }
 
   SongPlayer._internal();
-  Widget currentWidget = AlbumImageWidget(
-    initial: true,
-  );
+
   ValueKey _key;
   ValueKey get key => this._key;
   SongInfo latestSongInfo;
   SongInfo get getLatestSongInfo => this.latestSongInfo;
+  Uint8List imageByte;
+  get getImageByte => this.imageByte;
 
+  set setImageByte(imageByte) => this.imageByte = imageByte;
   set setLatestSongInfo(latestSongInfo) => this.latestSongInfo = latestSongInfo;
   set key(ValueKey value) => this._key = value;
-  get getCurrentWidget => this.currentWidget;
+
   List<SongInfo> currentPlayList = [];
   List<SongInfo> get getCurrentPlayList => this.currentPlayList;
 
   set setCurrentPlayList(currentPlayList) =>
       this.currentPlayList = currentPlayList;
-  set setCurrentWidget(currentWidget) => this.currentWidget = currentWidget;
+
   int _curentId;
   int _currentIndex;
   int get getCurentId => this._curentId;
@@ -113,29 +119,40 @@ class SongPlayer extends ChangeNotifier {
   Future<void> generatebackGroundColor(
     Uint8List byte,
   ) async {
-    ImageProvider<Object> image;
     if (byte != null) {
-      image = MemoryImage(byte);
+      final p = await MediaStores.getPalete(byte);
+      setLinearGradients(p);
+      print(p.toString());
     } else {
-      image = AssetImage('assets/music-note.png');
-    }
-    try {
-      final p = await PaletteGenerator.fromImageProvider(image);
+      final image = await rootBundle.load('assets/music-note.png');
+      final p = await MediaStores.getPalete(image.buffer.asUint8List());
+      print(p.toString());
+      setLinearGradients(p);
 
-      final newGradient = LinearGradient(
-          colors: [
-            p.dominantColor.color,
-            p.mutedColor.color,
-          ],
-          begin: Alignment.topCenter,
-          end: Alignment.bottomCenter,
-          stops: [0.4, 0.7]);
-      setGradientBackground = newGradient;
-      setPlayButtonColor = p.vibrantColor.color ?? p.darkMutedColor.color;
-    } catch (e) {
-      print(e);
+      // AssetImage('assets/music-note.png');
     }
   }
+
+  setLinearGradients(p) {
+    final newGradient = LinearGradient(
+        colors: [
+          p.dominantColor,
+          p.mutedColor,
+        ],
+        begin: Alignment.topCenter,
+        end: Alignment.bottomCenter,
+        stops: [0.4, 0.7]);
+    setGradientBackground = newGradient;
+    setPlayButtonColor = p.vibrantColor ?? p.darkMutedColor;
+    notifyListeners();
+  }
+
+  // isolateHandle(List<int> image) {
+  //   isolates.spawn(entryPoint,
+  //       name: 'path',
+  //       onReceive: (valye) {},
+  //       onInitialized: () => isolates.send('dvbdvndfv d', to: 'path'));
+  // }
 
   playInit() {
     setSliderValues();
@@ -191,16 +208,11 @@ class SongPlayer extends ChangeNotifier {
     player.currentIndexStream.listen((event) async {
       if (getCurrentPlayList.length != 0) {
         print('-------------' + event.toString());
-        key = ValueKey(event);
+
         final image = await Thumbnail.getQualityThumbnail(
             int.parse(getCurrentPlayList[event].id));
-
-        await generatebackGroundColor(image);
-
-        setCurrentWidget = AlbumImageWidget(
-          memeoryImage: image,
-          key: key,
-        );
+        setImageByte = image;
+        generatebackGroundColor(image);
 
         latestSongInfo = getCurrentPlayList[event];
         notifyListeners();
@@ -342,31 +354,6 @@ class SongPlayer extends ChangeNotifier {
     }
   }
 
-  Widget smallPlayerTextWidget(SongInfo info, Size size, BuildContext context) {
-    key = ValueKey(int.parse(info == null ? '0' : info.id));
-
-    return SmallTextPlayerWidget(
-      showShimmer: info == null ? true : false,
-      title: info?.title,
-      artist: info?.artist,
-      key: key,
-    );
-  }
-
-  Widget bigPlayerTextWidget(SongInfo info, Size size) {
-    key = ValueKey(int.parse(info?.id ?? '0'));
-
-    return TextPlayerWidget(
-      title: getLatestSongInfo.title,
-      artist: getLatestSongInfo.artist,
-      key: key,
-      fontSize: 22.0,
-      titletTextColor: Colors.white,
-      artisttextColor: Colors.white,
-      artistFontSize: 15,
-    );
-  }
-
   playButtonAnimation(AnimationController playButton) async {
     if (player.playing) {
       playButton.reverse();
@@ -435,4 +422,63 @@ class SongPlayer extends ChangeNotifier {
 
 _backgroundTaskEntrypoint() {
   AudioServiceBackground.run(() => AudioPlayerTask());
+}
+
+class Worker {
+  SendPort sendPort;
+  Isolate isolate;
+  Completer<void> isolateReady = Completer<void>();
+  Worker() {
+    init();
+  }
+  void getPate(ImageProvider imageProvider) {
+    sendPort.send(imageProvider);
+  }
+
+  Future<void> init() async {
+    var receivePort = ReceivePort();
+
+    receivePort.listen(handleMessage);
+    isolate = await Isolate.spawn(isolateEntry, receivePort.sendPort);
+  }
+
+  Future<void> get iisolateReady => isolateReady.future;
+  void dispose() {
+    isolate.kill();
+  }
+
+  static void isolateEntry(SendPort message) {
+    SendPort sendPort;
+
+    final recieve = ReceivePort();
+    recieve.listen((message) {
+      assert(message is PaletteGenerator);
+      sendPort.send(message as PaletteGenerator);
+    });
+    if (message is SendPort) {
+      sendPort = message;
+      sendPort.send(recieve.sendPort);
+      return;
+    }
+  }
+
+  void handleMessage(message) {
+    if (message is SendPort) {
+      sendPort = message;
+      isolateReady.complete();
+      return;
+    }
+    print(message);
+  }
+}
+
+getPal(ImageProvider<Object> image) async {
+  print('iiiiiiiiiiiiiiiiiiiiiiiiiiiiiii');
+  if (image != null) {
+    final p = PaletteGenerator.fromImageProvider(image);
+    print(p.toString());
+  } else
+    print('iiiiiiiiiiiiiiiiiiiiiiiiiiiiiii');
+
+  return null;
 }

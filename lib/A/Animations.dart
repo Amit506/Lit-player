@@ -20,7 +20,7 @@ class HeroPageBuilder extends PageRouteBuilder {
               SizeTransition(sizeFactor: animation, child: child),
         );
   @override
-  Duration get transitionDuration => Duration(seconds: 2);
+  Duration get transitionDuration => Duration(seconds: 5);
   @override
   Curve get barrierCurve => Curves.easeOutCubic;
 }

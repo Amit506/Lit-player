@@ -9,7 +9,6 @@ class AlbumImageWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    print(memeoryImage);
     if (initial) {
       return Center(
         child: CircularProgressIndicator(

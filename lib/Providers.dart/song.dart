@@ -10,8 +10,6 @@ class SongsService extends ChangeNotifier {
   final SongPlayer _songPlayer = SongPlayer();
   List<SongInfo> songInfoList = [];
   List<SongInfo> songShowList = [];
-  // ValueNotifier<List<Uint8List>> songThumbnails = ValueNotifier(<Uint8List>[]);
-  // List<bool> isAvailableThumnails = [];
   List<SongInfo> get allPlaysListAvailable => songInfoList;
   SongInfo currentSong;
   SongInfo get getCurrentSong => this.currentSong;
@@ -59,15 +57,6 @@ class SongsService extends ChangeNotifier {
       i++;
     }
   }
-
-  // Future<Uint8List> getQualityThumbnail(int index, int id) async {
-  //   final bitmap = await MediaStores.bitMap(id, width: 500, height: 500)
-  //       .onError((error, stackTrace) {
-  //     print(error.toString());
-  //     return null;
-  //   });
-  //   return bitmap;
-  // }
 }
 
 class Thumbnail {
