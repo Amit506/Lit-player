@@ -8,6 +8,11 @@ class VideoPlayerProvider extends ChangeNotifier {
   Timer _timer;
   Timer _rightFastForwardTimer;
   Timer _leftFastForwardTimer;
+  bool controllerWasPlaying = true;
+  bool isScrubbing = true;
+  bool get getIsScrubbing => this.isScrubbing;
+
+  set setIsScrubbing(isScrubbing) => this.isScrubbing = isScrubbing;
   VideoPlayerController _videocontroller;
   AnimationController animatedButtonController;
   int initialForward = 10;
@@ -88,12 +93,14 @@ class VideoPlayerProvider extends ChangeNotifier {
 
   void setOverLayOnEnd() {
     showOverLay = true;
-
+    removeTimer();
+    isScrubbing = true;
     notifyListeners();
   }
 
   void instantHideOverLay() {
     showOverLay = false;
+    isScrubbing = false;
     notifyListeners();
   }
 
@@ -113,6 +120,7 @@ class VideoPlayerProvider extends ChangeNotifier {
   }
 
   void showOverLayFunction() {
+    setIsScrubbing = true;
     removeTimer();
     showOverLay = true;
     setTimer();

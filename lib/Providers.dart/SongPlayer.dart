@@ -14,6 +14,7 @@ import 'package:flutter/services.dart';
 import 'package:isolate_handler/isolate_handler.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:lit_player/Providers.dart/BackgroundTask.dart';
+import 'package:lit_player/utils.dart/MusicLoopModes.dart';
 import 'package:lit_player/utils.dart/SlideBottomWidget.dart';
 import 'package:lit_player/utils.dart/albumimageWidgte.dart';
 import 'package:lit_player/utils.dart/text_player_widget.dart';
@@ -309,49 +310,6 @@ class SongPlayer extends ChangeNotifier {
 
   shuffleOf() async {
     await player.setShuffleModeEnabled(false);
-  }
-
-  Widget loopWidgets(VoidCallback onChange, LoopMode loopMode) {
-    Widget loopWidget;
-    switch (loopMode) {
-      case LoopMode.off:
-        {
-          loopWidget = IconButton(
-              color: Colors.grey[200],
-              icon: Icon(Icons.loop),
-              onPressed: onChange);
-        }
-        break;
-      case LoopMode.one:
-        {
-          loopWidget =
-              IconButton(icon: Icon(Icons.repeat), onPressed: onChange);
-        }
-        break;
-      case LoopMode.all:
-        {
-          loopWidget = IconButton(icon: Icon(Icons.loop), onPressed: onChange);
-        }
-        break;
-    }
-    return loopWidget;
-  }
-
-  Widget shuffleWidget(bool value, VoidCallback onTap) {
-    if (value) {
-      return IconButton(
-        icon: Icon(
-          Icons.shuffle,
-        ),
-        onPressed: onTap,
-      );
-    } else {
-      return IconButton(
-        color: Colors.grey[200],
-        icon: Icon(Icons.shuffle),
-        onPressed: onTap,
-      );
-    }
   }
 
   playButtonAnimation(AnimationController playButton) async {

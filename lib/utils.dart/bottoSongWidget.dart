@@ -67,6 +67,20 @@ class BottomSongWidget extends StatelessWidget {
                     clipBehavior: Clip.antiAlias,
                     fit: BoxFit.cover,
                     child: Hero(
+                      flightShuttleBuilder: (
+                        BuildContext flightContext,
+                        Animation<double> animation,
+                        HeroFlightDirection flightDirection,
+                        BuildContext fromHeroContext,
+                        BuildContext toHeroContext,
+                      ) {
+                        final Hero toHero = toHeroContext.widget;
+
+                        return RotationTransition(
+                          turns: animation,
+                          child: toHero.child,
+                        );
+                      },
                       tag: "a",
                       child: Selector<SongPlayer, Uint8List>(
                         selector: (_, changer) => changer.getImageByte,

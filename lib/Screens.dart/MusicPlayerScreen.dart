@@ -7,10 +7,13 @@ import 'package:just_audio/just_audio.dart';
 import 'package:lit_player/Providers.dart/SongPlayer.dart';
 import 'package:lit_player/Providers.dart/song.dart';
 import 'package:lit_player/Theme.dart/appTheme.dart';
+import 'package:lit_player/utils.dart/MusicLoopModes.dart';
 import 'package:lit_player/utils.dart/SongPlayerwidget.dart';
 import 'package:lit_player/utils.dart/albumimageWidgte.dart';
+import 'package:lit_player/utils.dart/bottomSheetTop.dart';
 import 'package:lit_player/utils.dart/getDuration.dart';
 import 'package:lit_player/utils.dart/text_player_widget.dart';
+import 'package:lit_player/utils.dart/videoButtonBoxDecorationWidget.dart';
 
 import 'package:media_stores/SongInfo.dart';
 import 'package:media_stores/media_stores.dart';
@@ -94,11 +97,15 @@ class _MusicPlayerScreenState extends State<MusicPlayerScreen>
         selector: (_, s) => s.getGradientBackground,
         builder: (context, value, child) {
           print("builder music screeb--");
-          return DecoratedBox(
-              decoration: BoxDecoration(
-                gradient: value ?? null,
-              ),
-              child: child);
+          return AnimatedContainer(
+            curve: Curves.bounceInOut,
+            onEnd: () {},
+            decoration: BoxDecoration(
+              gradient: value ?? null,
+            ),
+            duration: Duration(milliseconds: 500),
+            child: child,
+          );
         },
         child: SizedBox(
           width: size.width,
@@ -115,33 +122,36 @@ class _MusicPlayerScreenState extends State<MusicPlayerScreen>
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     Flexible(
-                      child: Selector<SongPlayer, SongInfo>(
-                        shouldRebuild: (previous, next) =>
-                            next.title != previous.title,
-                        selector: (_, changer) => changer.getLatestSongInfo,
-                        builder: (_, data, child) => AnimatedSwitcher(
-                          transitionBuilder: (child, animation) {
-                            final offsetAnimation = Tween<Offset>(
-                                    begin: Offset(1.0, 0.0), end: Offset.zero)
-                                .animate(animation);
-                            return SlideTransition(
-                              position: offsetAnimation,
-                              child: child,
-                            );
-                          },
-                          layoutBuilder: (Widget currentChild,
-                              List<Widget> previousChildren) {
-                            return currentChild;
-                          },
-                          duration: Duration(milliseconds: 500),
-                          child: TextPlayerWidget(
-                            title: data.title,
-                            artist: data.artist,
-                            key: ValueKey(data.hashCode),
-                            fontSize: 22.0,
-                            titletTextColor: Colors.white,
-                            artisttextColor: Colors.white,
-                            artistFontSize: 15,
+                      child: Padding(
+                        padding: const EdgeInsets.only(left: 8.0),
+                        child: Selector<SongPlayer, SongInfo>(
+                          shouldRebuild: (previous, next) =>
+                              next.title != previous.title,
+                          selector: (_, changer) => changer.getLatestSongInfo,
+                          builder: (_, data, child) => AnimatedSwitcher(
+                            transitionBuilder: (child, animation) {
+                              final offsetAnimation = Tween<Offset>(
+                                      begin: Offset(1.0, 0.0), end: Offset.zero)
+                                  .animate(animation);
+                              return SlideTransition(
+                                position: offsetAnimation,
+                                child: child,
+                              );
+                            },
+                            layoutBuilder: (Widget currentChild,
+                                List<Widget> previousChildren) {
+                              return currentChild;
+                            },
+                            duration: Duration(milliseconds: 500),
+                            child: TextPlayerWidget(
+                              title: data.title,
+                              artist: data.artist,
+                              key: ValueKey(data.hashCode),
+                              fontSize: 22.0,
+                              titletTextColor: Colors.white,
+                              artisttextColor: Colors.white,
+                              artistFontSize: 15,
+                            ),
                           ),
                         ),
                       ),
@@ -185,6 +195,7 @@ class _MusicPlayerScreenState extends State<MusicPlayerScreen>
                         },
                         duration: Duration(milliseconds: 500),
                         child: AlbumImageWidget(
+                          key: ValueKey(data.hashCode),
                           memeoryImage: data,
                         ),
                       ),
@@ -206,7 +217,7 @@ class _MusicPlayerScreenState extends State<MusicPlayerScreen>
                   }),
               Padding(
                 padding:
-                    const EdgeInsets.symmetric(horizontal: 10.0, vertical: 0.0),
+                    const EdgeInsets.symmetric(horizontal: 20.0, vertical: 0.0),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
@@ -249,14 +260,16 @@ class _MusicPlayerScreenState extends State<MusicPlayerScreen>
                   Selector<SongPlayer, LoopMode>(
                       selector: (_, foo) => foo.getLoopMode,
                       builder: (_, data, __) {
-                        return AnimatedSwitcher(
-                            duration: Duration(milliseconds: 500),
-                            child: songPlayer.loopWidgets(() {
-                              onChangingLoopMode(data);
-                            }, data));
+                        return MusicLoopModeWidget(
+                          loopMode: data,
+                          onChange: () {
+                            onChangingLoopMode(data);
+                          },
+                        );
                       }),
                   FavoriteButton(
-                    iconSize: 38,
+                    iconDisabledColor: Colors.white,
+                    iconSize: 30,
                     valueChanged: (_isFavorite) {},
                   ),
                   Selector<SongPlayer, bool>(
@@ -264,13 +277,15 @@ class _MusicPlayerScreenState extends State<MusicPlayerScreen>
                       builder: (_, data, __) {
                         return AnimatedSwitcher(
                             duration: Duration(milliseconds: 500),
-                            child: songPlayer.shuffleWidget(data, () {
-                              if (data) {
-                                songPlayer.shuffleOf();
-                              } else {
-                                songPlayer.shuffleOn();
-                              }
-                            }));
+                            child: MusiocShuffleWidget(
+                                isShuffling: data,
+                                onShuffle: () {
+                                  if (data) {
+                                    songPlayer.shuffleOf();
+                                  } else {
+                                    songPlayer.shuffleOn();
+                                  }
+                                }));
                       }),
                 ],
               )
@@ -282,118 +297,127 @@ class _MusicPlayerScreenState extends State<MusicPlayerScreen>
   }
 
   showMusicBottomSheet() {
-    _scaffold.currentState.showBottomSheet((context) => ListView(
-          shrinkWrap: true,
-          children: [
-            ListTile(
-              leading: Icon(Icons.music_note),
-              title: Text(songPlayer.getLatestSongInfo.title),
-            ),
-            ListTile(
-              leading: Icon(Icons.lock_clock),
-              onTap: () {
-                double timeSliderValue = 0.0;
-                _scaffold.currentState.showBottomSheet((context) =>
-                    StatefulBuilder(
-                      builder: (context, state) => Container(
-                        height: 200,
-                        width: double.infinity,
-                        child: Center(
-                          child: Padding(
-                            padding: EdgeInsets.symmetric(
-                                horizontal: 20, vertical: 20),
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                              children: [
-                                timeSliderValue == 0.0
-                                    ? Text(
-                                        'Sleep Timer off',
-                                        style: Theme.of(context)
-                                            .textTheme
-                                            .headline6,
-                                      )
-                                    : RichText(
-                                        text: TextSpan(children: [
-                                        TextSpan(
-                                          text: 'Stop audio in ',
-                                          style: Theme.of(context)
-                                              .textTheme
-                                              .headline6,
-                                        ),
-                                        TextSpan(
-                                          text: '${timeSliderValue.round()}',
-                                          style: Theme.of(context)
-                                              .textTheme
-                                              .headline6
-                                              .copyWith(color: darkBlueColor),
-                                        ),
-                                        TextSpan(
-                                          text: ' min',
+    _scaffold.currentState.showBottomSheet(
+        (context) => ListView(
+              physics: NeverScrollableScrollPhysics(),
+              shrinkWrap: true,
+              children: [
+                BottomSheetTop(),
+                ListTile(
+                  leading: Icon(Icons.music_note),
+                  title: Text(songPlayer.getLatestSongInfo.title),
+                ),
+                ListTile(
+                  leading: Icon(Icons.lock_clock),
+                  onTap: () {
+                    double timeSliderValue = 0.0;
+                    _scaffold.currentState.showBottomSheet(
+                      (context) => StatefulBuilder(
+                        builder: (context, state) => Container(
+                          height: 200,
+                          width: double.infinity,
+                          child: Center(
+                            child: Padding(
+                              padding: EdgeInsets.symmetric(
+                                  horizontal: 20, vertical: 20),
+                              child: Column(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceEvenly,
+                                children: [
+                                  timeSliderValue == 0.0
+                                      ? Text(
+                                          'Sleep Timer off',
                                           style: Theme.of(context)
                                               .textTheme
                                               .headline6,
                                         )
-                                      ])),
-                                Column(
-                                  children: [
-                                    SliderTheme(
-                                      data: SliderThemeData(
-                                          overlayShape: RoundSliderOverlayShape(
-                                              overlayRadius: 2.0),
-                                          thumbShape: RoundSliderThumbShape(
-                                              enabledThumbRadius: 8.0,
-                                              disabledThumbRadius: 8.0),
-                                          activeTrackColor: darkBlueColor,
-                                          trackHeight: 4.0,
-                                          thumbColor: darkBlueColor),
-                                      child: Slider(
-                                          max: 90.0,
-                                          min: 0.0,
-                                          value: timeSliderValue,
-                                          onChanged: (value) {
-                                            state(() {
-                                              timeSliderValue = value;
-                                              songPlayer
-                                                  .setSleepTimer(value.round());
-                                            });
-                                          }),
-                                    ),
-                                    Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
-                                      children: audioTimers
-                                          .map((e) => Text(
-                                                e,
-                                                style: Theme.of(context)
-                                                    .textTheme
-                                                    .caption,
-                                              ))
-                                          .toList(),
-                                    )
-                                  ],
-                                ),
-                              ],
+                                      : RichText(
+                                          text: TextSpan(children: [
+                                          TextSpan(
+                                            text: 'Stop audio in ',
+                                            style: Theme.of(context)
+                                                .textTheme
+                                                .headline6,
+                                          ),
+                                          TextSpan(
+                                            text: '${timeSliderValue.round()}',
+                                            style: Theme.of(context)
+                                                .textTheme
+                                                .headline6
+                                                .copyWith(color: darkBlueColor),
+                                          ),
+                                          TextSpan(
+                                            text: ' min',
+                                            style: Theme.of(context)
+                                                .textTheme
+                                                .headline6,
+                                          )
+                                        ])),
+                                  Column(
+                                    children: [
+                                      SliderTheme(
+                                        data: SliderThemeData(
+                                            overlayShape:
+                                                RoundSliderOverlayShape(
+                                                    overlayRadius: 2.0),
+                                            thumbShape: RoundSliderThumbShape(
+                                                enabledThumbRadius: 8.0,
+                                                disabledThumbRadius: 8.0),
+                                            activeTrackColor: darkBlueColor,
+                                            trackHeight: 4.0,
+                                            thumbColor: darkBlueColor),
+                                        child: Slider(
+                                            max: 90.0,
+                                            min: 0.0,
+                                            value: timeSliderValue,
+                                            onChanged: (value) {
+                                              state(() {
+                                                timeSliderValue = value;
+                                                songPlayer.setSleepTimer(
+                                                    value.round());
+                                              });
+                                            }),
+                                      ),
+                                      Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
+                                        children: audioTimers
+                                            .map((e) => Text(
+                                                  e,
+                                                  style: Theme.of(context)
+                                                      .textTheme
+                                                      .caption,
+                                                ))
+                                            .toList(),
+                                      )
+                                    ],
+                                  ),
+                                ],
+                              ),
                             ),
                           ),
                         ),
                       ),
-                    ));
-              },
-              title: Text('Set Sleep Timer'),
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(20)),
+                    );
+                  },
+                  title: Text('Set Sleep Timer'),
+                ),
+                ListTile(
+                  leading: Icon(Icons.share),
+                  onTap: () async {
+                    final filePath = await MediaStores.getPath(
+                        songPlayer.getLatestSongInfo.uri);
+                    await Share.shareFiles(
+                      [filePath],
+                    );
+                  },
+                  title: Text('Share'),
+                ),
+              ],
             ),
-            ListTile(
-              leading: Icon(Icons.share),
-              onTap: () async {
-                final filePath =
-                    await MediaStores.getPath(songPlayer.getLatestSongInfo.uri);
-                await Share.shareFiles(
-                  [filePath],
-                );
-              },
-              title: Text('Share'),
-            ),
-          ],
-        ));
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)));
   }
 
   final List<String> audioTimers = ['off', '30 min', '60 min', '90 min'];

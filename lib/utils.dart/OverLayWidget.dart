@@ -6,6 +6,7 @@ import 'package:lit_player/Providers.dart/VideoService.dart';
 import 'package:lit_player/Providers.dart/videoPlayerProvider.dart';
 import 'package:lit_player/utils.dart/getDuration.dart';
 import 'package:lit_player/utils.dart/ForwardWidget.dart';
+import 'package:lit_player/utils.dart/videoButtonBoxDecorationWidget.dart';
 import 'package:provider/provider.dart';
 import 'package:tuple/tuple.dart';
 import 'package:video_player/video_player.dart';
@@ -42,11 +43,15 @@ class _OverLayVideoWidgetState extends State<OverLayVideoWidget>
   void didUpdateWidget(covariant OverLayVideoWidget oldWidget) {
     super.didUpdateWidget(oldWidget);
     print("ollllllllllllllllllllllllllllldddddddddddddddddddddddddddddddd");
-    // if (widget.videoPlayerController.value. != oldWidget.videoPlayerController.value.position) {
-    //   _animatedButtonController.reverse();
-    // } else {
-    //   _animatedButtonController.forward();
-    // }
+
+    if (Provider.of<VideoPlayerProvider>(context)
+            .animatedButtonController
+            .isCompleted &&
+        !widget.isPlaying) {
+      Provider.of<VideoPlayerProvider>(context)
+          .animatedButtonController
+          .forward();
+    }
   }
 
   static const _playBackRates = [
@@ -127,21 +132,35 @@ class _OverLayVideoWidgetState extends State<OverLayVideoWidget>
                           }
                         }
                       : null,
-                  child: AnimatedIcon(
-                      size: 60,
-                      icon: AnimatedIcons.play_pause,
-                      progress: videoProvider.animatedButtonController),
+                  child: CircleAvatar(
+                    backgroundColor: Colors.black.withOpacity(0.4),
+                    radius: 40,
+                    child: AnimatedIcon(
+                        color: Colors.white,
+                        size: 60,
+                        icon: AnimatedIcons.play_pause,
+                        progress: videoProvider.animatedButtonController),
+                  ),
                 ),
               ),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text(getDuration(widget
-                          .videoPlayerController.value.position.inMilliseconds
-                          .toDouble()) +
-                      '/ ${getDuration(widget.videoPlayerController.value.duration.inMilliseconds.toDouble())}'),
+                  Text(
+                    getDuration(widget
+                            .videoPlayerController.value.position.inMilliseconds
+                            .toDouble()) +
+                        '/ ${getDuration(widget.videoPlayerController.value.duration.inMilliseconds.toDouble())}',
+                    style: Theme.of(context)
+                        .textTheme
+                        .caption
+                        .copyWith(color: Colors.white),
+                  ),
                   Row(mainAxisSize: MainAxisSize.min, children: [
                     IconButton(
+                        color: Colors.white,
+                        iconSize: 20.0,
+                        padding: const EdgeInsets.all(0.0),
                         icon: Icon(
                             videoProvider.videocontroller.value.volume == 0.0
                                 ? Icons.volume_off
@@ -153,6 +172,9 @@ class _OverLayVideoWidgetState extends State<OverLayVideoWidget>
                             videoProvider.videocontroller.setVolume(0.0);
                         }),
                     IconButton(
+                        color: Colors.white,
+                        iconSize: 20.0,
+                        padding: const EdgeInsets.all(0.0),
                         icon: Icon(Icons.fullscreen),
                         onPressed: videoProvider.showOverLay
                             ? () {
@@ -175,6 +197,7 @@ class _OverLayVideoWidgetState extends State<OverLayVideoWidget>
               Align(
                   alignment: Alignment.topRight,
                   child: PopupMenuButton<double>(
+                      color: Colors.white,
                       initialValue:
                           videoProvider.videocontroller.value.playbackSpeed,
                       tooltip: 'Playback speed',
@@ -193,8 +216,26 @@ class _OverLayVideoWidgetState extends State<OverLayVideoWidget>
                       })),
               Padding(
                 padding: EdgeInsets.only(bottom: 2.0),
-                child: VideoProgressIndicator(widget.videoPlayerController,
-                    allowScrubbing: true),
+                child: VideoProgressIndicator(
+                  widget.videoPlayerController,
+                  allowScrubbing: videoProvider.getIsScrubbing,
+                  onPanDown: (value) {
+                    videoProvider.controllerWasPlaying =
+                        videoProvider.videocontroller.value.isPlaying;
+                    print(
+                        "00000000000000000000000000000000000000000000000000000");
+                    videoProvider.setOverLayOnEnd();
+                  },
+                  onPanEnd: (value) {
+                    videoProvider.hideOverLay();
+                    videoProvider.setIsScrubbing = false;
+
+                    print(videoProvider.controllerWasPlaying);
+                    if (videoProvider.controllerWasPlaying) {
+                      videoProvider.videocontroller.play();
+                    }
+                  },
+                ),
               )
             ],
           ),
