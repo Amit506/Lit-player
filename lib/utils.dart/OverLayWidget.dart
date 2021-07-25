@@ -1,12 +1,9 @@
-import 'dart:math';
-
 import 'package:auto_orientation/auto_orientation.dart';
 import 'package:flutter/material.dart';
-import 'package:lit_player/Providers.dart/VideoService.dart';
+
 import 'package:lit_player/Providers.dart/videoPlayerProvider.dart';
 import 'package:lit_player/utils.dart/getDuration.dart';
 import 'package:lit_player/utils.dart/ForwardWidget.dart';
-import 'package:lit_player/utils.dart/videoButtonBoxDecorationWidget.dart';
 import 'package:provider/provider.dart';
 import 'package:tuple/tuple.dart';
 import 'package:video_player/video_player.dart';
@@ -42,7 +39,8 @@ class _OverLayVideoWidgetState extends State<OverLayVideoWidget>
   @override
   void didUpdateWidget(covariant OverLayVideoWidget oldWidget) {
     super.didUpdateWidget(oldWidget);
-    print("ollllllllllllllllllllllllllllldddddddddddddddddddddddddddddddd");
+    print(
+        "rebuilded----------------------------------------------------------");
 
     if (Provider.of<VideoPlayerProvider>(context)
             .animatedButtonController

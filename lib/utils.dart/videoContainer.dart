@@ -28,9 +28,6 @@ class VideoContainer extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Material(
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.all(Radius.zero),
-      ),
       child: InkWell(
         onTap: onTap,
         onLongPress: onLongPress,

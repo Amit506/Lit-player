@@ -32,6 +32,7 @@ dependencies:
   cupertino_icons: ^1.0.2
   favorite_button: ^0.0.4
   flutter_isolate: null
+  flutter_native_splash: ^1.2.0
   flutter_tts: ^3.1.0
   intl: ^0.17.0
   isolate_handler: ^1.0.0

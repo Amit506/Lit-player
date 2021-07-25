@@ -13,7 +13,6 @@ class AudioPlayerTask extends BackgroundAudioTask {
   final _audioPlayer = SongPlayer.player;
   @override
   Future<void> onStart(Map<String, dynamic> params) async {
-    print('started......................');
     AudioServiceBackground.setState(controls: [
       MediaControl.pause,
       MediaControl.stop,

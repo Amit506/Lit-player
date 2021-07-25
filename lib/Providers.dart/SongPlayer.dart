@@ -14,11 +14,8 @@ import 'package:flutter/services.dart';
 import 'package:isolate_handler/isolate_handler.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:lit_player/Providers.dart/BackgroundTask.dart';
-import 'package:lit_player/utils.dart/MusicLoopModes.dart';
-import 'package:lit_player/utils.dart/SlideBottomWidget.dart';
-import 'package:lit_player/utils.dart/albumimageWidgte.dart';
-import 'package:lit_player/utils.dart/text_player_widget.dart';
-import 'package:marquee/marquee.dart';
+import 'package:lit_player/Providers.dart/thumbnail.dart';
+
 import 'package:media_stores/SongInfo.dart';
 import 'package:media_stores/media_stores.dart';
 import 'package:palette_generator/palette_generator.dart';
@@ -28,6 +25,7 @@ import './song.dart';
 const universalImage = 'assets/SPACE_album-mock.jpg';
 
 class SongPlayer extends ChangeNotifier {
+  final highQualityThumbnail = Thumbnail(500, 600);
   final isolates = IsolateHandler();
   static AudioPlayer player = AudioPlayer();
   static final SongPlayer _singleton = SongPlayer._internal();
@@ -210,8 +208,8 @@ class SongPlayer extends ChangeNotifier {
       if (getCurrentPlayList.length != 0) {
         print('-------------' + event.toString());
 
-        final image = await Thumbnail.getQualityThumbnail(
-            int.parse(getCurrentPlayList[event].id));
+        final image = await highQualityThumbnail
+            .getSongThumbnail(int.parse(getCurrentPlayList[event].id));
         setImageByte = image;
         generatebackGroundColor(image);
 
@@ -352,27 +350,12 @@ class SongPlayer extends ChangeNotifier {
             androidEnableQueue: true,
             backgroundTaskEntrypoint: _backgroundTaskEntrypoint)
         .then((value) async {
-      // AudioService.playbackStateStream.listen((event) {
-
-      // });
-//       print("initiating background task");
-// // AudioService.
-//       print('isAudioSevice connected' + AudioService.connected.toString());
-//       print(AudioService.currentMediaItem);
-//       await AudioService.addQueueItems(mediaItem);
-//       await AudioServiceBackground.setMediaItem(mediaItem[0]);
-//       print("000000000000000000000");
-//       print("----------------------------------" + value.toString());
       AudioService.playbackStateStream.listen((event) {
         print('-------------------------------------------' +
             event.playing.toString());
         // setIsBackGroundAudioPlaying = event.playing;
       });
     });
-
-//     Thumbnail.getQualityThumbnail(0,  getCurrentPlayList[0].id);
-// final media = MediaItem(id: getCurrentPlayList[0].id, album:getCurrentPlayList[0]. album, title: getCurrentPlayList[0].title,bitMap: getCurrentPlayList[0])
-//     AudioServiceBackground.setMediaItem(getCurrentPlayList[isPlaying])
   }
 // }
 
@@ -382,61 +365,61 @@ _backgroundTaskEntrypoint() {
   AudioServiceBackground.run(() => AudioPlayerTask());
 }
 
-class Worker {
-  SendPort sendPort;
-  Isolate isolate;
-  Completer<void> isolateReady = Completer<void>();
-  Worker() {
-    init();
-  }
-  void getPate(ImageProvider imageProvider) {
-    sendPort.send(imageProvider);
-  }
+// class Worker {
+//   SendPort sendPort;
+//   Isolate isolate;
+//   Completer<void> isolateReady = Completer<void>();
+//   Worker() {
+//     init();
+//   }
+//   void getPate(ImageProvider imageProvider) {
+//     sendPort.send(imageProvider);
+//   }
 
-  Future<void> init() async {
-    var receivePort = ReceivePort();
+//   Future<void> init() async {
+//     var receivePort = ReceivePort();
 
-    receivePort.listen(handleMessage);
-    isolate = await Isolate.spawn(isolateEntry, receivePort.sendPort);
-  }
+//     receivePort.listen(handleMessage);
+//     isolate = await Isolate.spawn(isolateEntry, receivePort.sendPort);
+//   }
 
-  Future<void> get iisolateReady => isolateReady.future;
-  void dispose() {
-    isolate.kill();
-  }
+//   Future<void> get iisolateReady => isolateReady.future;
+//   void dispose() {
+//     isolate.kill();
+//   }
 
-  static void isolateEntry(SendPort message) {
-    SendPort sendPort;
+//   static void isolateEntry(SendPort message) {
+//     SendPort sendPort;
 
-    final recieve = ReceivePort();
-    recieve.listen((message) {
-      assert(message is PaletteGenerator);
-      sendPort.send(message as PaletteGenerator);
-    });
-    if (message is SendPort) {
-      sendPort = message;
-      sendPort.send(recieve.sendPort);
-      return;
-    }
-  }
+//     final recieve = ReceivePort();
+//     recieve.listen((message) {
+//       assert(message is PaletteGenerator);
+//       sendPort.send(message as PaletteGenerator);
+//     });
+//     if (message is SendPort) {
+//       sendPort = message;
+//       sendPort.send(recieve.sendPort);
+//       return;
+//     }
+//   }
 
-  void handleMessage(message) {
-    if (message is SendPort) {
-      sendPort = message;
-      isolateReady.complete();
-      return;
-    }
-    print(message);
-  }
-}
+//   void handleMessage(message) {
+//     if (message is SendPort) {
+//       sendPort = message;
+//       isolateReady.complete();
+//       return;
+//     }
+//     print(message);
+//   }
+// }
 
-getPal(ImageProvider<Object> image) async {
-  print('iiiiiiiiiiiiiiiiiiiiiiiiiiiiiii');
-  if (image != null) {
-    final p = PaletteGenerator.fromImageProvider(image);
-    print(p.toString());
-  } else
-    print('iiiiiiiiiiiiiiiiiiiiiiiiiiiiiii');
+// getPal(ImageProvider<Object> image) async {
+//   print('iiiiiiiiiiiiiiiiiiiiiiiiiiiiiii');
+//   if (image != null) {
+//     final p = PaletteGenerator.fromImageProvider(image);
+//     print(p.toString());
+//   } else
+//     print('iiiiiiiiiiiiiiiiiiiiiiiiiiiiiii');
 
-  return null;
-}
+//   return null;
+// }

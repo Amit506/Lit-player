@@ -2,6 +2,7 @@ import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:lit_player/A/Animations.dart';
+import 'package:lit_player/A/HeromusicScreen.dart';
 import 'package:lit_player/Providers.dart/SongPlayer.dart';
 import 'package:lit_player/Screens.dart/MusicPlayerScreen.dart';
 import 'package:lit_player/utils.dart/SlideBottomWidget.dart';
@@ -28,6 +29,7 @@ class BottomSongWidget extends StatelessWidget {
     final songPlayer = Provider.of<SongPlayer>(context, listen: false);
 
     return Material(
+      elevation: 1.0,
       color: Theme.of(context).primaryColor,
       child: Column(
         children: [

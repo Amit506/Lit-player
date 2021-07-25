@@ -1,13 +1,17 @@
 import 'package:flutter/foundation.dart';
+import 'package:lit_player/Providers.dart/thumbnail.dart';
 import 'package:media_stores/media_stores.dart';
 import 'package:media_stores/videoInfo.dart';
 
 class VideoService extends ChangeNotifier {
+  final lowQualityThumbNail = Thumbnail(480, 480);
   List<VideoInfo> videoList = [];
 
   List<VideoInfo> videoShowList = [];
 
   void initState({bool setDefault = false}) async {
+    videoList.clear();
+    videoShowList.clear();
     if (videoList.length == 0 || setDefault) {
       final allVideos = await MediaStores.getVideos();
       videoList = allVideos;
@@ -50,8 +54,10 @@ class VideoService extends ChangeNotifier {
   Future getThumbail({int index, int id, int start = 0, int end = 20}) async {
     int i = start;
     while (i < end) {
-      final bitmap = await MediaStores.videoBitMap(int.parse(videoList[i].id),
-              width: 360, height: 280)
+      final bitmap = await lowQualityThumbNail
+          .getVideoThumbnail(
+        int.parse(videoList[i].id),
+      )
           .onError((error, stackTrace) {
         print(error.toString());
         return null;

@@ -4,7 +4,7 @@ import 'package:lit_player/Providers.dart/VideoService.dart';
 import 'package:lit_player/Providers.dart/song.dart';
 import 'package:lit_player/Screens.dart/HomeScreen.dart';
 import 'package:lit_player/Theme.dart/appTheme.dart';
-import 'package:media_stores/media_stores.dart';
+
 import 'package:permission_handler/permission_handler.dart';
 
 import 'package:provider/provider.dart';
@@ -23,8 +23,6 @@ class _SplashScreenState extends State<SplashScreen>
   void initState() {
     super.initState();
     permission();
-    Provider.of<SongsService>(context, listen: false).initState();
-    Provider.of<VideoService>(context, listen: false).initState();
 
     animateController = AnimationController(
       duration: Duration(milliseconds: 800),
@@ -45,32 +43,28 @@ class _SplashScreenState extends State<SplashScreen>
         body: Container(
       color: lightGreenColor,
       child: Center(
-        child: FadeTransition(
-          opacity:
-              Tween<double>(begin: 0.0, end: 1.0).animate(animateController),
-          child: Container(
-            height: 200,
-            width: 200,
-            child: Hero(
-              flightShuttleBuilder: (
-                BuildContext flightContext,
-                Animation<double> animation,
-                HeroFlightDirection flightDirection,
-                BuildContext fromHeroContext,
-                BuildContext toHeroContext,
-              ) {
-                final Hero toHero = toHeroContext.widget;
+        child: Container(
+          height: 250,
+          width: 250,
+          child: Hero(
+            flightShuttleBuilder: (
+              BuildContext flightContext,
+              Animation<double> animation,
+              HeroFlightDirection flightDirection,
+              BuildContext fromHeroContext,
+              BuildContext toHeroContext,
+            ) {
+              final Hero toHero = toHeroContext.widget;
 
-                return RotationTransition(
-                  turns: animation,
-                  child: toHero.child,
-                );
-              },
-              tag: 'appIcon',
-              child: Image.asset(
-                'assets/f8a7b6e4-6564-4094-b027-357b0dcef705_200x200.png',
-                fit: BoxFit.cover,
-              ),
+              return RotationTransition(
+                turns: animation,
+                child: FadeTransition(opacity: animation, child: toHero.child),
+              );
+            },
+            tag: 'appIcon',
+            child: Image.asset(
+              'assets/appIcon.png',
+              fit: BoxFit.cover,
             ),
           ),
         ),
@@ -80,10 +74,13 @@ class _SplashScreenState extends State<SplashScreen>
 
   void permission() async {
     if (!await Permission.storage.isGranted) {
-      await Permission.storage.request();
+      await Permission.storage.request().then((value) {
+        if (value.isGranted) {
+          Provider.of<SongsService>(context, listen: false).initState();
+        }
+      });
+    } else {
+      Provider.of<SongsService>(context, listen: false).initState();
     }
   }
 }
-// class HeroFlight extends HeroFlightShuttleBuilder{
-
-// }

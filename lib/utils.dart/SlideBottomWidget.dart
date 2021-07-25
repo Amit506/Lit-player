@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:lit_player/utils.dart/text_player_widget.dart';
-import 'package:shimmer/shimmer.dart';
 
 class SlideBottomWidget extends StatelessWidget {
   final Widget child;
@@ -49,7 +48,7 @@ class SmallTextPlayerWidget extends StatelessWidget {
         ? child
         : TextPlayerWidget(
             title: title ?? "Unknown",
-            artist: artist ?? "__",
+            artist: artist ?? "--",
             key: key,
             fontSize: Theme.of(context).textTheme.subtitle1.fontSize,
             titletTextColor: Theme.of(context).textTheme.subtitle1.color,

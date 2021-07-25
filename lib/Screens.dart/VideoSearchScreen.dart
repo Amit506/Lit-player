@@ -21,7 +21,7 @@ class _SearchScreenState extends State<SearchScreen> {
   @override
   void dispose() {
     super.dispose();
-    _debounce.cancel();
+    _debounce?.cancel();
   }
 
   onChange(String value, SearchService searchService) {

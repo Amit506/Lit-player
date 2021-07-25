@@ -2,7 +2,7 @@ import 'dart:math';
 
 import 'package:audio_service/audio_service.dart';
 import 'package:flutter/material.dart';
-import 'package:lit_player/A/music_visualizer.dart';
+
 import 'package:lit_player/Providers.dart/SongPlayer.dart';
 import 'package:lit_player/Providers.dart/song.dart';
 import 'package:lit_player/Screens.dart/VideoScreen.dart';
@@ -42,7 +42,6 @@ class _HomeScreenState extends State<HomeScreen>
       case AppLifecycleState.resumed:
         {
           if (Provider.of<SongPlayer>(context, listen: false).isPlaying) {
-            print('---isplaying');
             _animatedButtonController.forward();
           } else if (!Provider.of<SongPlayer>(context, listen: false)
               .isPlaying) {
@@ -63,7 +62,6 @@ class _HomeScreenState extends State<HomeScreen>
   void didChangeDependencies() {
     super.didChangeDependencies();
     if (Provider.of<SongPlayer>(context, listen: false).isPlaying) {
-      print('---isplaying');
       _animatedButtonController.forward();
     } else if (!Provider.of<SongPlayer>(context, listen: false).isPlaying) {
       _animatedButtonController.reverse();
@@ -88,16 +86,15 @@ class _HomeScreenState extends State<HomeScreen>
 
   @override
   Widget build(BuildContext context) {
-    print('rebuild------------------------');
     final size = MediaQuery.of(context).size;
     final songPlayer = Provider.of<SongPlayer>(context, listen: false);
-    // final songService = Provider.of<SongsService>(context, listen: false);
 
     return Scaffold(
       appBar: AppBar(
         actions: [
           IconButton(
-              icon: Icon(Icons.nightlight_round),
+              icon: Transform.rotate(
+                  angle: -pi / 6, child: Icon(Icons.nightlight_round)),
               onPressed: () =>
                   Provider.of<AppTheme>(context, listen: false).changeTheme()),
           IconButton(
@@ -109,8 +106,7 @@ class _HomeScreenState extends State<HomeScreen>
         ],
         leading: Hero(
           tag: 'appIcon',
-          child: Image.asset(
-              'assets/f8a7b6e4-6564-4094-b027-357b0dcef705_200x200.png'),
+          child: Image.asset('assets/appIcon.png'),
         ),
         title: Text(
           'Lit player',
@@ -127,8 +123,6 @@ class _HomeScreenState extends State<HomeScreen>
           child: Stack(
             children: [
               Consumer<SongsService>(builder: (context, value, child) {
-                print(
-                    "called...........................................................");
                 if (value.songShowList != null &&
                     value.songShowList.length == 0) {
                   return Center(
@@ -144,59 +138,67 @@ class _HomeScreenState extends State<HomeScreen>
                       }
                       return true;
                     },
-                    child: ListView.separated(
-                      separatorBuilder: (context, i) {
-                        return Divider(
-                          indent: 60,
-                        );
+                    child: RefreshIndicator(
+                      onRefresh: () async {
+                        Provider.of<SongsService>(context, listen: false)
+                            .initState();
+                        return initiating();
                       },
-                      itemCount: value.songShowList.length,
-                      itemBuilder: (_, i) {
-                        final songs = value.songShowList;
-                        return ListTile(
-                          trailing: Selector<SongPlayer, SongInfo>(
-                            child: SizedBox(
-                              height: 20,
-                              width: 30,
-                              // child: VisualizerWidget()
+                      child: ListView.separated(
+                        separatorBuilder: (context, i) {
+                          return Divider(
+                            indent: 60,
+                          );
+                        },
+                        itemCount: value.songShowList.length,
+                        itemBuilder: (_, i) {
+                          final songs = value.songShowList;
+                          return ListTile(
+                            trailing: Selector<SongPlayer, SongInfo>(
+                              child: SizedBox(
+                                height: 20,
+                                width: 30,
+                                // child: VisualizerWidget()
+                              ),
+                              selector: (_, s) => s.latestSongInfo,
+                              builder: (context, value, child) {
+                                if (value == songs[i]) {
+                                  return child;
+                                } else {
+                                  return SizedBox();
+                                }
+                              },
                             ),
-                            selector: (_, s) => s.latestSongInfo,
-                            builder: (context, value, child) {
-                              if (value == songs[i]) {
-                                return child;
-                              } else {
-                                return SizedBox();
-                              }
+                            subtitle: Text(songs[i].artist ?? "--"),
+                            onTap: () async {
+                              songPlayer.playerSetAudioSoucres(
+                                  Provider.of<SongsService>(context,
+                                          listen: false)
+                                      .allPlaysListAvailable,
+                                  initialIndex: i);
+                              songPlayer.play();
+                              _animatedButtonController.forward();
                             },
-                          ),
-                          subtitle: Text(songs[i].artist ?? "_ _"),
-                          onTap: () async {
-                            songPlayer.playerSetAudioSoucres(
-                                Provider.of<SongsService>(context,
-                                        listen: false)
-                                    .allPlaysListAvailable,
-                                initialIndex: i);
-                            songPlayer.play();
-                            _animatedButtonController.forward();
-                          },
-                          leading: FittedBox(
-                            fit: BoxFit.cover,
-                            child: Selector<SongsService, List<SongInfo>>(
-                                selector: (_, changer) => changer.songShowList,
-                                builder: (_, data, child) {
-                                  Widget animatedSwitcherChild = data[i]
-                                              .imageBit !=
-                                          null
-                                      ? AlbumArtAvatar(image: data[i].imageBit)
-                                      : Tempavatar();
-                                  return AnimatedSwitcher(
-                                      duration: Duration(milliseconds: 500),
-                                      child: animatedSwitcherChild);
-                                }),
-                          ),
-                          title: Text(songs[i].title ?? "Unknown"),
-                        );
-                      },
+                            leading: FittedBox(
+                              fit: BoxFit.cover,
+                              child: Selector<SongsService, List<SongInfo>>(
+                                  selector: (_, changer) =>
+                                      changer.songShowList,
+                                  builder: (_, data, child) {
+                                    Widget animatedSwitcherChild =
+                                        data[i].imageBit != null
+                                            ? AlbumArtAvatar(
+                                                image: data[i].imageBit)
+                                            : MusicTempAvatar();
+                                    return AnimatedSwitcher(
+                                        duration: Duration(milliseconds: 500),
+                                        child: animatedSwitcherChild);
+                                  }),
+                            ),
+                            title: Text(songs[i].title ?? "Unknown"),
+                          );
+                        },
+                      ),
                     ),
                   );
                 }
@@ -231,8 +233,8 @@ class _HomeScreenState extends State<HomeScreen>
       ..indexesStream()
       ..sequenceStateChange()
       ..listenStream()
-      ..initiatingBackGroundTask()
-      ..playerState();
+      ..playerState()
+      ..initiatingBackGroundTask();
   }
 }
 

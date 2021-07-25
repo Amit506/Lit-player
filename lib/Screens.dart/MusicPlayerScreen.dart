@@ -64,7 +64,6 @@ class _MusicPlayerScreenState extends State<MusicPlayerScreen>
   void didChangeDependencies() {
     super.didChangeDependencies();
     if (Provider.of<SongPlayer>(context, listen: false).isPlaying) {
-      print('---isplaying');
       _animatedButtonController.forward();
     } else if (!Provider.of<SongPlayer>(context, listen: false).isPlaying) {
       _animatedButtonController.reverse();
@@ -96,7 +95,6 @@ class _MusicPlayerScreenState extends State<MusicPlayerScreen>
       body: Selector<SongPlayer, LinearGradient>(
         selector: (_, s) => s.getGradientBackground,
         builder: (context, value, child) {
-          print("builder music screeb--");
           return AnimatedContainer(
             curve: Curves.bounceInOut,
             onEnd: () {},
@@ -145,7 +143,7 @@ class _MusicPlayerScreenState extends State<MusicPlayerScreen>
                             duration: Duration(milliseconds: 500),
                             child: TextPlayerWidget(
                               title: data.title ?? "Unknown",
-                              artist: data.artist ?? "unknown",
+                              artist: data.artist ?? "--",
                               key: ValueKey(data.hashCode),
                               fontSize: 22.0,
                               titletTextColor: Colors.white,

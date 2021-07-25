@@ -31,7 +31,6 @@ class _HorizontalVideoPlayerState extends State<HorizontalVideoPlayer>
     super.initState();
     _videoPlayerProvider =
         Provider.of<VideoPlayerProvider>(context, listen: false);
-
     Provider.of<VideoPlayerProvider>(context, listen: false)
             .animatedButtonController =
         AnimationController(vsync: this, duration: Duration(milliseconds: 500));
@@ -42,7 +41,6 @@ class _HorizontalVideoPlayerState extends State<HorizontalVideoPlayer>
     _controller.initialize().then(
           (_) => setState(
             () {
-              print(_controller.value.isInitialized);
               _controller.play();
               _animatedButtonController.forward();
               Provider.of<VideoPlayerProvider>(context, listen: false)
@@ -112,7 +110,6 @@ class _HorizontalVideoPlayerState extends State<HorizontalVideoPlayer>
               behavior: HitTestBehavior.opaque,
               onDoubleTapDown: (value) => onDoubleTap(value, videoProvider),
               onTap: () async {
-                print('----------------');
                 if (videoProvider.showOverLay) {
                   videoProvider.instantHideOverLay();
                 } else {

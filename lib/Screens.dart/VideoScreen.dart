@@ -6,11 +6,11 @@ import 'package:lit_player/Providers.dart/VideoService.dart';
 import 'package:lit_player/Providers.dart/videoPlayerProvider.dart';
 import 'package:lit_player/Screens.dart/HorizontalVideoPlayer.dart';
 import 'package:lit_player/Screens.dart/VideoSearchScreen.dart';
-import 'package:lit_player/utils.dart/VideoListAvatar.dart';
+
 import 'package:lit_player/utils.dart/bottomSheetTop.dart';
 import 'package:lit_player/utils.dart/videoContainer.dart';
 import 'package:media_stores/media_stores.dart';
-import 'package:media_stores/videoInfo.dart';
+
 import 'package:provider/provider.dart';
 
 import 'package:lit_player/utils.dart/getDuration.dart';
@@ -27,6 +27,7 @@ class _VideoListScreenState extends State<VideoListScreen> {
   @override
   void initState() {
     super.initState();
+    Provider.of<VideoService>(context, listen: false).initState();
   }
 
   int index = 15;
@@ -64,112 +65,110 @@ class _VideoListScreenState extends State<VideoListScreen> {
           ),
         ],
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(4.0),
-        child: Consumer<VideoService>(
-          builder: (context, value, child) {
-            if (value.videoList.length == 0) {
-              return Center(
-                child: Text('No videos available in device'),
-              );
-            } else {
-              final videos = value.videoShowList;
-              return NotificationListener<ScrollUpdateNotification>(
-                onNotification: (notification) {
-                  if (notification.metrics.pixels ==
-                      notification.metrics.maxScrollExtent) {
-                    value.updateVideoShowList(value.videoShowList.length,
-                        value.videoShowList.length + 30);
-                  }
-                  return true;
-                },
-                child: GridView.builder(
-                  // key: PageStorageKey(1),
-                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: 2,
-                      crossAxisSpacing: 4,
-                      mainAxisSpacing: 4),
-                  itemBuilder: (BuildContext context, int index) {
-                    print(videos[index].dateAdded);
-                    return VideoContainer(
-                      date: df.format(
-                        DateTime.parse(videos[index].dateAdded),
-                      ),
-                      size:
-                          '${videos[index].size.substring(0, videos[index].size.length < 4 ? videos[index].size.length : 4)} mb',
-                      fileName: videos[index].title,
-                      index: index,
-                      duration: videos[index].duration,
-                      onTap: () async {
-                        final filePath =
-                            await MediaStores.getPath(videos[index].uri);
-                        print(filePath.toString());
-                        if (filePath != null) {
-                          Provider.of<VideoPlayerProvider>(context,
-                                  listen: false)
-                              .onInitVideo(filePath);
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (_) => HorizontalVideoPlayer(
-                                uri: filePath,
-                              ),
-                            ),
-                          );
-                        }
-                      },
-                      onLongPress: () async {
-                        final filePath =
-                            await MediaStores.getPath(videos[index].uri);
-                        _scaffold.currentState.showBottomSheet(
-                          (context) => ListView(
-                              physics: NeverScrollableScrollPhysics(),
-                              shrinkWrap: true,
-                              children: [
-                                BottomSheetTop(),
-                                ListTile(
-                                  leading: Icon(Icons.video_label),
-                                  title: Text(videos[index].title),
-                                  subtitle: Text(videos[index].duration != null
-                                      ? getDuration(
-                                          double.parse(videos[index].duration))
-                                      : '-'),
-                                  trailing: Text(
-                                      '${videos[index].size.substring(0, videos[index].size.length < 4 ? videos[index].size.length : 4)} mb'),
-                                ),
-                                ListTile(
-                                  leading: Icon(Icons.share),
-                                  onTap: () async {
-                                    if (filePath != null)
-                                      await Share.shareFiles(
-                                        [filePath],
-                                      );
-                                  },
-                                  title: Text('Share'),
-                                ),
-                                ListTile(
-                                  leading: Icon(Icons.filter_none_rounded),
-                                  // onTap: () async {
-                                  //   final filePath = await MediaStores.getPath(
-                                  //       videos[index].uri);
-                                  //   await Share.shareFiles(
-                                  //     [filePath],
-                                  //   );
-                                  // },
-                                  title: Text(filePath ?? '---'),
-                                ),
-                              ]),
-                          shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(20)),
-                        );
-                      },
-                    );
+      body: RefreshIndicator(
+        onRefresh: () async {
+          return Provider.of<VideoService>(context, listen: false).initState();
+        },
+        child: Padding(
+          padding: const EdgeInsets.all(4.0),
+          child: Consumer<VideoService>(
+            builder: (context, value, child) {
+              if (value.videoList.length == 0) {
+                return Center(
+                  child: Text('No videos available in device'),
+                );
+              } else {
+                final videos = value.videoShowList;
+                return NotificationListener<ScrollUpdateNotification>(
+                  onNotification: (notification) {
+                    if (notification.metrics.pixels ==
+                        notification.metrics.maxScrollExtent) {
+                      value.updateVideoShowList(value.videoShowList.length,
+                          value.videoShowList.length + 30);
+                    }
+                    return true;
                   },
-                  itemCount: videos.length,
-                ),
-              );
-            }
-          },
+                  child: GridView.builder(
+                    // key: PageStorageKey(1),
+                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                        crossAxisCount: 2,
+                        crossAxisSpacing: 4,
+                        mainAxisSpacing: 4),
+                    itemBuilder: (BuildContext context, int index) {
+                      return VideoContainer(
+                        date: df.format(
+                          DateTime.parse(videos[index].dateAdded),
+                        ),
+                        size:
+                            '${videos[index].size.substring(0, videos[index].size.length < 4 ? videos[index].size.length : 4)} mb',
+                        fileName: videos[index].title,
+                        index: index,
+                        duration: videos[index].duration,
+                        onTap: () async {
+                          final filePath =
+                              await MediaStores.getPath(videos[index].uri);
+
+                          if (filePath != null) {
+                            Provider.of<VideoPlayerProvider>(context,
+                                    listen: false)
+                                .onInitVideo(filePath);
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (_) => HorizontalVideoPlayer(
+                                  uri: filePath,
+                                ),
+                              ),
+                            );
+                          }
+                        },
+                        onLongPress: () async {
+                          final filePath =
+                              await MediaStores.getPath(videos[index].uri);
+                          _scaffold.currentState.showBottomSheet(
+                            (context) => ListView(
+                                physics: NeverScrollableScrollPhysics(),
+                                shrinkWrap: true,
+                                children: [
+                                  BottomSheetTop(),
+                                  ListTile(
+                                    leading: Icon(Icons.video_label),
+                                    title: Text(videos[index].title),
+                                    subtitle: Text(
+                                        videos[index].duration != null
+                                            ? getDuration(double.parse(
+                                                videos[index].duration))
+                                            : '-'),
+                                    trailing: Text(
+                                        '${videos[index].size.substring(0, videos[index].size.length < 4 ? videos[index].size.length : 4)} mb'),
+                                  ),
+                                  ListTile(
+                                    leading: Icon(Icons.share),
+                                    onTap: () async {
+                                      if (filePath != null)
+                                        await Share.shareFiles(
+                                          [filePath],
+                                        );
+                                    },
+                                    title: Text('Share'),
+                                  ),
+                                  ListTile(
+                                    leading: Icon(Icons.filter_none_rounded),
+                                    title: Text(filePath ?? '---'),
+                                  ),
+                                ]),
+                            shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(20)),
+                          );
+                        },
+                      );
+                    },
+                    itemCount: videos.length,
+                  ),
+                );
+              }
+            },
+          ),
         ),
       ),
       floatingActionButton: FloatingActionButton(

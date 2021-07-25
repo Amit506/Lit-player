@@ -2,9 +2,10 @@ import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 
-class Tempavatar extends StatelessWidget {
-  final isSong;
-  const Tempavatar({Key key, this.isSong = true}) : super(key: key);
+class MusicTempAvatar extends StatelessWidget {
+  const MusicTempAvatar({
+    Key key,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -14,10 +15,8 @@ class Tempavatar extends StatelessWidget {
       decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(15.0),
           image: DecorationImage(
-              image: AssetImage(!isSong
-                  ? 'assets/video-player.png'
-                  : 'assets/music-note.png'),
-              fit: BoxFit.cover)),
+            image: AssetImage('assets/music-note.png'),
+          )),
     );
   }
 }
@@ -46,12 +45,13 @@ class VideoTempavatar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      decoration: BoxDecoration(
+        decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(15.0),
-          image: DecorationImage(
-              image: AssetImage('assets/video-player.png'),
-              fit: BoxFit.contain)),
-    );
+        ),
+        child: Icon(
+          Icons.video_collection_rounded,
+          size: 50,
+        ));
   }
 }
 
