@@ -23,6 +23,7 @@ class VideoPlayerProvider extends ChangeNotifier {
       this._videocontroller = value;
   onInitVideo(String uri) {
     videocontroller = VideoPlayerController.file(File.fromUri(Uri.parse(uri)));
+    print(videocontroller.value.isPlaying);
     sliderListenSetup();
     postionStream();
   }

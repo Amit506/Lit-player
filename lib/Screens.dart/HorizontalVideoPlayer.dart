@@ -8,7 +8,7 @@ import 'package:lit_player/main.dart';
 import 'package:lit_player/utils.dart/OverLayWidget.dart';
 import 'package:provider/provider.dart';
 import 'package:share/share.dart';
-import 'package:tuple/tuple.dart';
+
 import 'package:video_player/video_player.dart';
 
 class HorizontalVideoPlayer extends StatefulWidget {
@@ -25,25 +25,31 @@ class _HorizontalVideoPlayerState extends State<HorizontalVideoPlayer>
   VideoPlayerProvider _videoPlayerProvider;
   AnimationController _animatedButtonController;
   // bool showOverLay = true;
+  // double aspectRatio;
   @override
   void initState() {
     super.initState();
     _videoPlayerProvider =
         Provider.of<VideoPlayerProvider>(context, listen: false);
-    _controller = _videoPlayerProvider.videocontroller;
+
     Provider.of<VideoPlayerProvider>(context, listen: false)
             .animatedButtonController =
         AnimationController(vsync: this, duration: Duration(milliseconds: 500));
-
+    _controller = _videoPlayerProvider.videocontroller;
     _animatedButtonController =
         Provider.of<VideoPlayerProvider>(context, listen: false)
             .animatedButtonController;
-    _controller.initialize().then((_) => setState(() {
-          _controller.play();
-          _animatedButtonController.forward();
-          Provider.of<VideoPlayerProvider>(context, listen: false)
-              .hideOverLay();
-        }));
+    _controller.initialize().then(
+          (_) => setState(
+            () {
+              print(_controller.value.isInitialized);
+              _controller.play();
+              _animatedButtonController.forward();
+              Provider.of<VideoPlayerProvider>(context, listen: false)
+                  .hideOverLay();
+            },
+          ),
+        );
   }
 
   @override
@@ -62,6 +68,7 @@ class _HorizontalVideoPlayerState extends State<HorizontalVideoPlayer>
   void dispose() {
     super.dispose();
     _videoPlayerProvider.videocontroller.dispose();
+    _videoPlayerProvider.animatedButtonController.dispose();
     AutoOrientation.portraitUpMode();
   }
 
@@ -70,21 +77,37 @@ class _HorizontalVideoPlayerState extends State<HorizontalVideoPlayer>
 
   @override
   Widget build(BuildContext context) {
-    // final size = MediaQuery.of(context).size;
+    final size = MediaQuery.of(context).size;
+
     final videoProvider =
         Provider.of<VideoPlayerProvider>(context, listen: false);
-    return Scaffold(
+    final screen = Scaffold(
       backgroundColor: Colors.black87,
       body: Center(
         child: SizedBox(
           child: AspectRatio(
-            aspectRatio: _controller.value.aspectRatio,
+            aspectRatio: _videoPlayerProvider.videocontroller.value.aspectRatio,
             child: GestureDetector(
               onLongPress: () async {
                 await Share.shareFiles(
                   [widget.uri],
                 );
               },
+              // onScaleUpdate: (scale) {
+              //   print("---------------------");
+              //   print(scale);
+              //   // final renderBox = context.findRenderObject() as RenderBox;
+              //   // final height = renderBox.size.height + scale.verticalScale;
+              //   // final width = renderBox.size.height + scale.horizontalScale;
+              //   // aspectRatio = height / width;
+              //   // if (aspectRatio > _controller.value.aspectRatio &&
+              //   //     aspectRatio <= size.height / size.width) {
+              //   //   setState(() {
+              //   //     aspectRatio = height / width;
+              //   //   });
+              //   // }
+              // },
+              onScaleEnd: (scaleEnd) {},
               onDoubleTap: () {},
               behavior: HitTestBehavior.opaque,
               onDoubleTapDown: (value) => onDoubleTap(value, videoProvider),
@@ -102,16 +125,17 @@ class _HorizontalVideoPlayerState extends State<HorizontalVideoPlayer>
                 children: [
                   VideoPlayer(_controller),
                   Selector<VideoPlayerProvider, bool>(
-                      selector: (_, changer) => changer.showOverLay,
-                      builder: (_, data, child) => Positioned.fill(
-                            child: OverLayVideoWidget(
-                              rightInkWellTap: rightInkWellTap,
-                              leftInkWellTap: leftInkWellTap,
-                              showControls: data,
-                              isPlaying: _controller.value.isPlaying,
-                              videoPlayerController: _controller,
-                            ),
-                          )),
+                    selector: (_, changer) => changer.showOverLay,
+                    builder: (_, data, child) => Positioned.fill(
+                      child: OverLayVideoWidget(
+                        rightInkWellTap: rightInkWellTap,
+                        leftInkWellTap: leftInkWellTap,
+                        showControls: data,
+                        isPlaying: _controller.value.isPlaying,
+                        videoPlayerController: _controller,
+                      ),
+                    ),
+                  ),
                 ],
               ),
             ),
@@ -119,17 +143,20 @@ class _HorizontalVideoPlayerState extends State<HorizontalVideoPlayer>
         ),
       ),
     );
+    // if (videoProvider.videocontroller.value.isInitialized) {
+    return screen;
+    // } else {
+
+    //   Navigator.pop(context);
+    //   ScaffoldMessenger.of(context)
+    //       .showSnackBar(SnackBar(content: Text('Something went wrong')));
+    // }
   }
 
   onDoubleTap(TapDownDetails value, VideoPlayerProvider videoProvider) {
     videoProvider.showOverLayFunction();
     final renderBox = context.findRenderObject() as RenderBox;
     final double limit = renderBox.size.width / 2;
-    // final divided = renderBox.size.width / 3;
-
-    print(limit);
-
-    print(value.localPosition.dx);
     if (limit - 20 > value.localPosition.dx) {
       leftInkWellTap();
 

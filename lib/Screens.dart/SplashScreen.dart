@@ -4,6 +4,8 @@ import 'package:lit_player/Providers.dart/VideoService.dart';
 import 'package:lit_player/Providers.dart/song.dart';
 import 'package:lit_player/Screens.dart/HomeScreen.dart';
 import 'package:lit_player/Theme.dart/appTheme.dart';
+import 'package:media_stores/media_stores.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 import 'package:provider/provider.dart';
 
@@ -20,8 +22,10 @@ class _SplashScreenState extends State<SplashScreen>
   @override
   void initState() {
     super.initState();
+    permission();
     Provider.of<SongsService>(context, listen: false).initState();
     Provider.of<VideoService>(context, listen: false).initState();
+
     animateController = AnimationController(
       duration: Duration(milliseconds: 800),
       vsync: this,
@@ -72,6 +76,12 @@ class _SplashScreenState extends State<SplashScreen>
         ),
       ),
     ));
+  }
+
+  void permission() async {
+    if (!await Permission.storage.isGranted) {
+      await Permission.storage.request();
+    }
   }
 }
 // class HeroFlight extends HeroFlightShuttleBuilder{

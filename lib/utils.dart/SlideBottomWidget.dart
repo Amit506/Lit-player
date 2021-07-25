@@ -48,8 +48,8 @@ class SmallTextPlayerWidget extends StatelessWidget {
     return showShimmer
         ? child
         : TextPlayerWidget(
-            title: title,
-            artist: artist,
+            title: title ?? "Unknown",
+            artist: artist ?? "__",
             key: key,
             fontSize: Theme.of(context).textTheme.subtitle1.fontSize,
             titletTextColor: Theme.of(context).textTheme.subtitle1.color,

@@ -222,8 +222,7 @@ class _OverLayVideoWidgetState extends State<OverLayVideoWidget>
                   onPanDown: (value) {
                     videoProvider.controllerWasPlaying =
                         videoProvider.videocontroller.value.isPlaying;
-                    print(
-                        "00000000000000000000000000000000000000000000000000000");
+
                     videoProvider.setOverLayOnEnd();
                   },
                   onPanEnd: (value) {

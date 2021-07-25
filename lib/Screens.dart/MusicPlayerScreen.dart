@@ -144,8 +144,8 @@ class _MusicPlayerScreenState extends State<MusicPlayerScreen>
                             },
                             duration: Duration(milliseconds: 500),
                             child: TextPlayerWidget(
-                              title: data.title,
-                              artist: data.artist,
+                              title: data.title ?? "Unknown",
+                              artist: data.artist ?? "unknown",
                               key: ValueKey(data.hashCode),
                               fontSize: 22.0,
                               titletTextColor: Colors.white,

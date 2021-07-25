@@ -33,10 +33,12 @@ dependencies:
   favorite_button: ^0.0.4
   flutter_isolate: null
   flutter_tts: ^3.1.0
+  intl: ^0.17.0
   isolate_handler: ^1.0.0
   just_audio: ^0.8.0
   marquee: ^2.2.0
   palette_generator: ^0.3.0
+  permission_handler: ^8.1.4+1
   provider: ^5.0.0
   share: ^2.0.4
   shimmer: ^2.0.0

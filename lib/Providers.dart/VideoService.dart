@@ -4,14 +4,13 @@ import 'package:media_stores/videoInfo.dart';
 
 class VideoService extends ChangeNotifier {
   List<VideoInfo> videoList = [];
-  List<VideoInfo> videoListStore = [];
+
   List<VideoInfo> videoShowList = [];
 
   void initState({bool setDefault = false}) async {
     if (videoList.length == 0 || setDefault) {
       final allVideos = await MediaStores.getVideos();
       videoList = allVideos;
-      videoListStore = allVideos;
 
       updateVideoShowList(0, videoList.length < 30 ? videoList.length : 30);
     }
@@ -38,7 +37,11 @@ class VideoService extends ChangeNotifier {
         return double.parse(b.size).compareTo(double.parse(a.size));
       });
     } else {
-      initState(setDefault: true);
+      videoList.sort((a, b) {
+        var date1 = DateTime.parse(a.dateAdded);
+        var date2 = DateTime.parse(b.dateAdded);
+        return date2.compareTo(date1);
+      });
     }
     videoShowList.clear();
     updateVideoShowList(0, videoList.length < 30 ? videoList.length : 30);
@@ -48,7 +51,7 @@ class VideoService extends ChangeNotifier {
     int i = start;
     while (i < end) {
       final bitmap = await MediaStores.videoBitMap(int.parse(videoList[i].id),
-              width: 160, height: 120)
+              width: 360, height: 280)
           .onError((error, stackTrace) {
         print(error.toString());
         return null;

@@ -10,8 +10,8 @@ class TextPlayerWidget extends StatelessWidget {
   final Color artisttextColor;
   const TextPlayerWidget(
       {Key key,
-      this.title,
-      this.artist,
+      this.title = "Unknown",
+      this.artist = "__",
       this.fontSize,
       this.titletTextColor,
       this.artisttextColor,

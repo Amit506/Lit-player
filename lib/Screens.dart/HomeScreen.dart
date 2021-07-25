@@ -92,6 +92,7 @@ class _HomeScreenState extends State<HomeScreen>
     final size = MediaQuery.of(context).size;
     final songPlayer = Provider.of<SongPlayer>(context, listen: false);
     // final songService = Provider.of<SongsService>(context, listen: false);
+
     return Scaffold(
       appBar: AppBar(
         actions: [
@@ -168,7 +169,7 @@ class _HomeScreenState extends State<HomeScreen>
                               }
                             },
                           ),
-                          subtitle: Text(songs[i].artist),
+                          subtitle: Text(songs[i].artist ?? "_ _"),
                           onTap: () async {
                             songPlayer.playerSetAudioSoucres(
                                 Provider.of<SongsService>(context,
@@ -193,27 +194,13 @@ class _HomeScreenState extends State<HomeScreen>
                                       child: animatedSwitcherChild);
                                 }),
                           ),
-                          title: Text(songs[i].title),
+                          title: Text(songs[i].title ?? "Unknown"),
                         );
                       },
                     ),
                   );
                 }
               }),
-              // Positioned(
-              //   top: size.height / 2,
-              //   right: 0.0,
-              //   child: Transform.rotate(
-              //     angle: -pi / 2,
-              //     alignment: Alignment.centerRight,
-              //     child: ClipPath(
-              //         clipper: CustomHalfCircleClipper(),
-              //         child: CircleAvatar(
-              //           radius: 30,
-              //         )),
-              //   ),
-              // ),
-
               Align(
                 alignment: Alignment.bottomCenter,
                 child: SizedBox(
