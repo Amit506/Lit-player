@@ -53,8 +53,9 @@ class AppTheme extends ChangeNotifier {
       ));
 }
 
-const darkGreenColor = Color(0xFF0A2E07);
-const lightGreenColor = Color(0xffc5e1a5);
+const darkGreenColor = Color(0xFF100949);
+// Color(0xFF0A2E07);
+const lightGreenColor = Color(0xFF7AD3E7);
 const lightBlueColor = Color(0xff8FD6E1);
 const darkBlueColor = Color(0xff150E56);
 const lightGreen = Color(0xffA3F7BF);

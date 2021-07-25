@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:lit_player/Providers.dart/SearchProvider.dart';
 import 'package:lit_player/Providers.dart/videoPlayerProvider.dart';
 import 'package:lit_player/Screens.dart/HorizontalVideoPlayer.dart';
+import 'package:lottie/lottie.dart';
 import 'package:media_stores/media_stores.dart';
 import 'package:provider/provider.dart';
 import 'package:lit_player/utils.dart/getDuration.dart';
@@ -41,6 +42,7 @@ class _SearchScreenState extends State<SearchScreen> {
         title: TextField(
           onChanged: (value) => onChange(value, searchService),
           decoration: InputDecoration(
+            suffixIcon: IconButton(icon: Icon(Icons.cancel), onPressed: () {}),
             fillColor: Colors.white38,
             hintText: 'Search....',
             enabledBorder: UnderlineInputBorder(),
@@ -59,15 +61,16 @@ class _SearchScreenState extends State<SearchScreen> {
                 return Center(
                   child: Hero(
                     tag: "b",
-                    child: Icon(
-                      Icons.search,
-                      size: 120,
-                    ),
+                    child: Lottie.asset(
+                        'assets/65743-search-magnifying-glass.json',
+                        animate: true,
+                        repeat: true),
                   ),
                 );
               } else if (value.searchStatus == SearchStatus.NoFound) {
                 return Center(
-                  child: Text('Not Found'),
+                  child: Lottie.asset('assets/13525-empty.json',
+                      animate: true, repeat: true),
                 );
               } else {
                 final list = value.searchResult;

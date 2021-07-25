@@ -105,9 +105,11 @@ class _HomeScreenState extends State<HomeScreen>
               })
         ],
         leading: Hero(
-          tag: 'appIcon',
-          child: Image.asset('assets/appIcon.png'),
-        ),
+            tag: 'appIcon',
+            child: Image.asset(
+              'assets/newAppIcon.png',
+              scale: 1,
+            )),
         title: Text(
           'Lit player',
           style: TextStyle(

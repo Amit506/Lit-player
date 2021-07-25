@@ -45,13 +45,13 @@ class VideoTempavatar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(15.0),
-        ),
+        // decoration: BoxDecoration(
+        //   borderRadius: BorderRadius.circular(15.0),
+        // ),
         child: Icon(
-          Icons.video_collection_rounded,
-          size: 50,
-        ));
+      Icons.video_collection_rounded,
+      size: 50,
+    ));
   }
 }
 
@@ -63,7 +63,7 @@ class VideoAlbumArtAvatar extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(10.0),
+          // borderRadius: BorderRadius.circular(10.0),
           image: DecorationImage(image: MemoryImage(image), fit: BoxFit.cover)),
     );
   }

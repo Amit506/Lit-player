@@ -64,9 +64,10 @@ class VideoService extends ChangeNotifier {
       });
 
       if (bitmap != null) {
-        videoList[i] = videoList[i].copyWith(imageBit: bitmap);
-
-        videoShowList[i] = videoList[i];
+        try {
+          videoList[i] = videoList[i].copyWith(imageBit: bitmap);
+          videoShowList[i] = videoList[i];
+        } catch (e) {}
 
         notifyListeners();
       }

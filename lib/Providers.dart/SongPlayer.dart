@@ -8,17 +8,15 @@ import 'package:audio_service/audio_service.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/scheduler.dart';
-import 'package:flutter/scheduler.dart';
 import 'package:flutter/services.dart';
-import 'package:isolate_handler/isolate_handler.dart';
+
 import 'package:just_audio/just_audio.dart';
 import 'package:lit_player/Providers.dart/BackgroundTask.dart';
 import 'package:lit_player/Providers.dart/thumbnail.dart';
 
 import 'package:media_stores/SongInfo.dart';
 import 'package:media_stores/media_stores.dart';
-import 'package:palette_generator/palette_generator.dart';
+
 import 'package:shimmer/shimmer.dart';
 import './song.dart';
 
@@ -26,7 +24,7 @@ const universalImage = 'assets/SPACE_album-mock.jpg';
 
 class SongPlayer extends ChangeNotifier {
   final highQualityThumbnail = Thumbnail(500, 600);
-  final isolates = IsolateHandler();
+
   static AudioPlayer player = AudioPlayer();
   static final SongPlayer _singleton = SongPlayer._internal();
   final backgroundAudioPlayer = AudioPlayerTask();
@@ -236,11 +234,12 @@ class SongPlayer extends ChangeNotifier {
 
   playerState() {
     player.playerStateStream.listen((event) {
-      print(AudioService.currentMediaItem);
-      if (event.playing)
-        AudioService.play();
-      else {
-        AudioService.pause();
+      if (AudioService.running) {
+        if (event.playing)
+          AudioService.play();
+        else {
+          AudioService.pause();
+        }
       }
     });
   }
@@ -350,11 +349,11 @@ class SongPlayer extends ChangeNotifier {
             androidEnableQueue: true,
             backgroundTaskEntrypoint: _backgroundTaskEntrypoint)
         .then((value) async {
-      AudioService.playbackStateStream.listen((event) {
-        print('-------------------------------------------' +
-            event.playing.toString());
-        // setIsBackGroundAudioPlaying = event.playing;
-      });
+      // AudioService.playbackStateStream.listen((event) {
+      //   print('-------------------------------------------' +
+      //       event.playing.toString());
+      //   // setIsBackGroundAudioPlaying = event.playing;
+      // });
     });
   }
 // }

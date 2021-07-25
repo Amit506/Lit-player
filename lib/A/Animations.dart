@@ -17,7 +17,12 @@ class HeroPageBuilder extends PageRouteBuilder {
             Animation<double> secondaryAnimation,
             Widget child,
           ) =>
-              SizeTransition(sizeFactor: animation, child: child),
+              SlideTransition(
+                  position: Tween<Offset>(
+                    begin: const Offset(-1, 0),
+                    end: Offset.zero,
+                  ).animate(animation),
+                  child: child),
         );
   @override
   Duration get transitionDuration => Duration(seconds: 4);

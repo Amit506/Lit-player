@@ -4,6 +4,7 @@ import 'package:lit_player/Providers.dart/VideoService.dart';
 import 'package:lit_player/Providers.dart/song.dart';
 import 'package:lit_player/Screens.dart/HomeScreen.dart';
 import 'package:lit_player/Theme.dart/appTheme.dart';
+import 'package:lottie/lottie.dart';
 
 import 'package:permission_handler/permission_handler.dart';
 
@@ -25,10 +26,9 @@ class _SplashScreenState extends State<SplashScreen>
     permission();
 
     animateController = AnimationController(
-      duration: Duration(milliseconds: 800),
+      duration: Duration(seconds: 2),
       vsync: this,
-    )..forward().whenComplete(() => Navigator.pushReplacement(
-        context, HeroPageBuilder(page: HomeScreen())));
+    );
   }
 
   @override
@@ -41,32 +41,31 @@ class _SplashScreenState extends State<SplashScreen>
   Widget build(BuildContext context) {
     return Scaffold(
         body: Container(
-      color: lightGreenColor,
       child: Center(
         child: Container(
           height: 250,
           width: 250,
           child: Hero(
-            flightShuttleBuilder: (
-              BuildContext flightContext,
-              Animation<double> animation,
-              HeroFlightDirection flightDirection,
-              BuildContext fromHeroContext,
-              BuildContext toHeroContext,
-            ) {
-              final Hero toHero = toHeroContext.widget;
+              flightShuttleBuilder: (
+                BuildContext flightContext,
+                Animation<double> animation,
+                HeroFlightDirection flightDirection,
+                BuildContext fromHeroContext,
+                BuildContext toHeroContext,
+              ) {
+                final Hero toHero = toHeroContext.widget;
 
-              return RotationTransition(
-                turns: animation,
-                child: FadeTransition(opacity: animation, child: toHero.child),
-              );
-            },
-            tag: 'appIcon',
-            child: Image.asset(
-              'assets/appIcon.png',
-              fit: BoxFit.cover,
-            ),
-          ),
+                return RotationTransition(
+                    turns: animation, child: toHero.child);
+              },
+              tag: 'appIcon',
+              child: Lottie.asset("assets/32560-music-icon.json",
+                  animate: true,
+                  controller: animateController, onLoaded: (value) {
+                animateController
+                  ..forward().whenComplete(() => Navigator.pushReplacement(
+                      context, HeroPageBuilder(page: HomeScreen())));
+              })),
         ),
       ),
     ));
