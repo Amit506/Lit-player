@@ -31,7 +31,7 @@ class VideoPlayerProvider extends ChangeNotifier {
   setShowLeftfastForwardWidget() {
     videocontroller.seekTo(Duration(
         seconds: videocontroller.value.position.inSeconds - initialForward));
-    initialForward -= 10;
+    initialForward += 10;
     if (_leftFastForwardTimer?.isActive ?? false)
       _rightFastForwardTimer.cancel();
 
