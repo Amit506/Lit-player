@@ -23,6 +23,7 @@ class VideoPlayerProvider extends ChangeNotifier {
       this._videocontroller = value;
   onInitVideo(String uri) {
     videocontroller = VideoPlayerController.file(File.fromUri(Uri.parse(uri)));
+    aspectratio = videocontroller.value.aspectRatio;
     print(videocontroller.value.isPlaying);
     sliderListenSetup();
     postionStream();
@@ -69,8 +70,11 @@ class VideoPlayerProvider extends ChangeNotifier {
   }
 
   void sliderListenSetup() async {
+    sliderMax = 0;
     sliderMax = videocontroller.value.duration.inMilliseconds;
     sliderCurrent = 0;
+    sliderMin = 0;
+
     notifyListeners();
   }
 
@@ -137,6 +141,8 @@ class VideoPlayerProvider extends ChangeNotifier {
         setOverLayOnEnd();
         notifyListeners();
       }
+      sliderCurrent = videocontroller.value.position.inMilliseconds;
+      notifyListeners();
     });
   }
 
@@ -146,4 +152,22 @@ class VideoPlayerProvider extends ChangeNotifier {
 
     super.dispose();
   }
+
+  fullSizeAspectratio() {
+    if (aspectratio == screenSizeAspectioRatio)
+      aspectratio = videocontroller.value.aspectRatio;
+    else
+      aspectratio = screenSizeAspectioRatio;
+    notifyListeners();
+  }
+
+  double _screenSizeAspectioRatio;
+  double get screenSizeAspectioRatio => this._screenSizeAspectioRatio;
+
+  set screenSizeAspectioRatio(double value) =>
+      this._screenSizeAspectioRatio = value;
+  double _aspectratio;
+  double get aspectratio => this._aspectratio;
+
+  set aspectratio(double value) => this._aspectratio = value;
 }

@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:auto_orientation/auto_orientation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:lit_player/Providers.dart/SongPlayer.dart';
 import 'package:lit_player/Providers.dart/videoPlayerProvider.dart';
 import 'package:lit_player/main.dart';
@@ -41,6 +42,8 @@ class _HorizontalVideoPlayerState extends State<HorizontalVideoPlayer>
     _controller.initialize().then(
           (_) => setState(
             () {
+              _videoPlayerProvider.aspectratio =
+                  _videoPlayerProvider.videocontroller.value.aspectRatio;
               _controller.play();
               _animatedButtonController.forward();
               Provider.of<VideoPlayerProvider>(context, listen: false)
@@ -79,12 +82,13 @@ class _HorizontalVideoPlayerState extends State<HorizontalVideoPlayer>
 
     final videoProvider =
         Provider.of<VideoPlayerProvider>(context, listen: false);
+    videoProvider.screenSizeAspectioRatio = size.aspectRatio;
     final screen = Scaffold(
       backgroundColor: Colors.black87,
       body: Center(
         child: SizedBox(
           child: AspectRatio(
-            aspectRatio: _videoPlayerProvider.videocontroller.value.aspectRatio,
+            aspectRatio: Provider.of<VideoPlayerProvider>(context).aspectratio,
             child: GestureDetector(
               onLongPress: () async {
                 await Share.shareFiles(
@@ -125,6 +129,11 @@ class _HorizontalVideoPlayerState extends State<HorizontalVideoPlayer>
                     selector: (_, changer) => changer.showOverLay,
                     builder: (_, data, child) => Positioned.fill(
                       child: OverLayVideoWidget(
+                        currentTime: Provider.of<VideoPlayerProvider>(context)
+                            .sliderCurrent,
+                        time: Provider.of<VideoPlayerProvider>(context,
+                                listen: false)
+                            .sliderMax,
                         rightInkWellTap: rightInkWellTap,
                         leftInkWellTap: leftInkWellTap,
                         showControls: data,

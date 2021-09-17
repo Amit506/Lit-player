@@ -44,32 +44,60 @@ class VideoContainer extends StatelessWidget {
                       child: animatedSwitcherChild,
                       duration: Duration(milliseconds: 500));
                 }),
-            Shadow(
-              offset: Offset(
-                0.0,
-                160,
-              ),
-            ),
+            // ShadowWidget(
+            //   offset: Offset(
+            //     0.0,
+            //     160,
+            //   ),
+            // ),
             Padding(
               padding: const EdgeInsets.all(4.0),
               child: Align(
                 alignment: Alignment.topRight,
-                child: Text(size, style: Theme.of(context).textTheme.bodyText2),
+                child: Text(
+                  size,
+                  style: Theme.of(context).textTheme.bodyText2.copyWith(
+                    color: Colors.white,
+                    shadows: [
+                      Shadow(
+                        offset: Offset(1.0, 1.0),
+                        blurRadius: 1.0,
+                        color: Colors.black87,
+                      ),
+                    ],
+                  ),
+                ),
               ),
             ),
-            Shadow(
-              offset: Offset(
-                0.0,
-                200,
+            Align(
+              alignment: Alignment.topLeft,
+              child: Icon(
+                Icons.play_circle_fill_rounded,
+                color: Colors.white,
               ),
             ),
+            // ShadowWidget(
+            //   offset: Offset(
+            //     0.0,
+            //     200,
+            //   ),
+            // ),
             Padding(
               padding: const EdgeInsets.all(4.0),
               child: Align(
                 alignment: Alignment.bottomLeft,
                 child: Text(
                   date,
-                  style: Theme.of(context).textTheme.bodyText2,
+                  style: Theme.of(context).textTheme.bodyText2.copyWith(
+                    color: Colors.white,
+                    shadows: [
+                      Shadow(
+                        offset: Offset(1.0, 1.0),
+                        blurRadius: 1.0,
+                        color: Colors.black87,
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ),
@@ -80,22 +108,22 @@ class VideoContainer extends StatelessWidget {
   }
 }
 
-class Shadow extends StatelessWidget {
-  final Offset offset;
-  const Shadow({Key key, this.offset}) : super(key: key);
+// class ShadowWidget extends StatelessWidget {
+//   final Offset offset;
+//   const ShadowWidget({Key key, this.offset}) : super(key: key);
 
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(boxShadow: [
-        BoxShadow(
-            color: Provider.of<AppTheme>(context).currentTheme ==
-                    CurrentTheme.Light
-                ? Colors.white60.withOpacity(0.6)
-                : Colors.black26.withOpacity(0.6),
-            spreadRadius: 10.0,
-            offset: offset)
-      ]),
-    );
-  }
-}
+//   @override
+//   Widget build(BuildContext context) {
+//     return Container(
+//       decoration: BoxDecoration(boxShadow: [
+//         BoxShadow(
+//             color: Provider.of<AppTheme>(context).currentTheme ==
+//                     CurrentTheme.Light
+//                 ? Colors.white60.withOpacity(0.6)
+//                 : Colors.black26.withOpacity(0.6),
+//             spreadRadius: 10.0,
+//             offset: offset)
+//       ]),
+//     );
+//   }
+// }
